@@ -1,6 +1,12 @@
 package org.vyavahaar.app.ui.screens.home
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.speech.RecognizerIntent
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -48,6 +54,42 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+
+    val speechRecognizerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val spokenText = result.data
+                ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                ?.firstOrNull()
+            if (!spokenText.isNullOrBlank()) {
+                viewModel.stopListeningAndProcess(spokenText)
+            } else {
+                viewModel.dismissAssistant()
+            }
+        } else {
+            viewModel.dismissAssistant()
+        }
+    }
+
+    fun launchSpeechRecognition() {
+        viewModel.startListening()
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "hi-IN")
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "hi-IN")
+            putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, false)
+            putExtra(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES, arrayListOf("hi-IN", "en-IN", "en-US"))
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Boliye, main sun raha hoon... (Speak now...)")
+            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
+        }
+        try {
+            speechRecognizerLauncher.launch(intent)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Voice input not supported on this device. Using demo mode.", Toast.LENGTH_SHORT).show()
+            viewModel.stopListeningAndProcess("Mujhe aaj ke satsang dikhao")
+        }
+    }
 
     // Pulsing animation for microphone when active
     val infiniteTransition = rememberInfiniteTransition(label = "mic_pulse")
@@ -227,10 +269,9 @@ fun HomeScreen(
                     .background(MicOrangeYellow)
                     .clickable {
                         if (uiState.isListening) {
-                            // Finish speech and process sample command or detected text
-                            viewModel.stopListeningAndProcess("Mujhe aaj ke satsang dikhao")
+                            viewModel.dismissAssistant()
                         } else {
-                            viewModel.startListening()
+                            launchSpeechRecognition()
                         }
                     }
                     .semantics {

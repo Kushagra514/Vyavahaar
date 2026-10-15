@@ -1,0 +1,68 @@
+name: Vyavahaar CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  backend-tests:
+    name: Backend API & NLU Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: "backend/requirements.txt"
+
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Initialize SQLite Database
+        run: |
+          cd backend
+          python app/db_init.py
+
+      - name: Run Backend Automated Tests (Pytest)
+        run: |
+          ./scripts/run_backend_tests.sh
+
+      - name: Run Live API Smoke Test
+        run: |
+          cd backend
+          uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          sleep 3
+          cd ..
+          ./scripts/smoke_test.sh http://127.0.0.1:8000
+
+  android-build-check:
+    name: Android Gradle Configuration Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Verify Gradle Tasks
+        run: |
+          cd android
+          ./gradlew tasks --no-daemon

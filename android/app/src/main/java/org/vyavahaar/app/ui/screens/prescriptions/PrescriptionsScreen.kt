@@ -1,5 +1,11 @@
 package org.vyavahaar.app.ui.screens.prescriptions
 
+import android.graphics.Bitmap
+import android.util.Base64
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import java.io.ByteArrayOutputStream
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,6 +46,30 @@ fun PrescriptionsScreen(
     var scanResult by remember { mutableStateOf<PrescriptionResponseDto?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap: Bitmap? ->
+        if (bitmap != null) {
+            isLoading = true
+            coroutineScope.launch {
+                try {
+                    val outputStream = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
+                    val base64Image = Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
+                    val res = prescriptionRepo.scanPrescription(base64Image)
+                    isLoading = false
+                    res.onSuccess { scanResult = it }
+                        .onFailure {
+                            Toast.makeText(context, "Prescription scan vifal raha. Kripya punah prayas karein.", Toast.LENGTH_SHORT).show()
+                        }
+                } catch (e: Exception) {
+                    isLoading = false
+                    Toast.makeText(context, "Photo process karne mein truti: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = { VyavahaarTopBar(title = "Dawai & Parchi Jankaari", onBackClick = onBack) },
         containerColor = WarmCreamBackground
@@ -67,11 +97,16 @@ fun PrescriptionsScreen(
                     VyavahaarButton(
                         text = if (isLoading) "Scan ho raha hai..." else "Parchi Photo Scan Karein",
                         onClick = {
-                            isLoading = true
-                            coroutineScope.launch {
-                                val res = prescriptionRepo.scanPrescription("sample_prescription_base64_payload")
-                                isLoading = false
-                                res.onSuccess { scanResult = it }
+                            try {
+                                cameraLauncher.launch(null)
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Camera uplabdh nahi hai. Sample demo scan kar rahe hain.", Toast.LENGTH_SHORT).show()
+                                isLoading = true
+                                coroutineScope.launch {
+                                    val res = prescriptionRepo.scanPrescription("sample_prescription_base64_payload")
+                                    isLoading = false
+                                    res.onSuccess { scanResult = it }
+                                }
                             }
                         }
                     )
