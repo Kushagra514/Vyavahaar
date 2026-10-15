@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vyavahaar — Senior Companion App Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-warm: #F4F0EC;
+            --surface-card: #FFFFFF;
+            --text-high: #1C1B1F;
+            --text-med: #5A5660;
+            --sos-red: #BA1A1A;
+            --sos-bg: #FFDAD6;
+            --mic-yellow: #FEB732;
+            --terracotta: #D84315;
+            --green: #2E7D32;
+            --font-scale: 1.15;
+        }
+
+        body.dark-mode {
+            --bg-warm: #1C1B1F;
+            --surface-card: #2B2930;
+            --text-high: #E6E1E5;
+            --text-med: #CAC4D0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Mukta', 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #E6E2DC;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Phone mockup container */
+        .phone-bezel {
+            width: 100%;
+            max-width: 420px;
+            height: 820px;
+            background: var(--bg-warm);
+            border: 12px solid #222;
+            border-radius: 44px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Screen Header */
+        .brand-title {
+            font-size: calc(26px * var(--font-scale));
+            font-weight: 800;
+            color: var(--text-high);
+            line-height: 1.1;
+        }
+
+        .greeting {
+            font-size: calc(20px * var(--font-scale));
+            font-weight: 600;
+            color: var(--text-high);
+            margin-top: 6px;
+            line-height: 1.3;
+        }
+
+        /* Red SOS Button from Mockup */
+        .sos-wrapper {
+            margin: 28px 0 16px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-sos {
+            background: var(--sos-red);
+            color: #FFFFFF;
+            font-size: calc(22px * var(--font-scale));
+            font-weight: 800;
+            letter-spacing: 2px;
+            border: none;
+            border-radius: 14px;
+            padding: 14px 44px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(186, 26, 26, 0.4);
+            transition: transform 0.15s, background-color 0.2s;
+            width: 190px;
+            text-align: center;
+        }
+
+        .btn-sos:active {
+            transform: scale(0.95);
+        }
+
+        .sos-status-pill {
+            margin-top: 12px;
+            border: 2px solid var(--sos-red);
+            border-radius: 20px;
+            padding: 4px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--sos-red);
+            letter-spacing: 0.5px;
+        }
+
+        /* Center Big Push-to-Talk Microphone */
+        .mic-section {
+            margin: auto 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .btn-mic {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: var(--mic-yellow);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(254, 183, 50, 0.5);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .btn-mic svg {
+            width: 74px;
+            height: 74px;
+            fill: #FFFFFF;
+        }
+
+        .btn-mic:active, .btn-mic.listening {
+            transform: scale(1.1);
+            animation: pulse-ring 1.4s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(254, 183, 50, 0.7); }
+            70% { box-shadow: 0 0 0 26px rgba(254, 183, 50, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(254, 183, 50, 0); }
+        }
+
+        .mic-prompt {
+            margin-top: 18px;
+            font-size: calc(18px * var(--font-scale));
+            font-weight: 600;
+            color: var(--text-high);
+            max-width: 290px;
+            line-height: 1.35;
+        }
+
+        /* Quick Voice Chips */
+        .voice-chips {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .chip {
+            background: var(--surface-card);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-high);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .chip:hover {
+            border-color: var(--terracotta);
+            color: var(--terracotta);
+        }
+
+        /* Assistant Response Card */
+        .feedback-card {
+            display: none;
+            margin-top: 16px;
+            background: var(--surface-card);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            text-align: left;
+            width: 100%;
+        }
+
+        .feedback-card.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Bottom Nav matching reference */
+        .bottom-nav {
+            height: 72px;
+            background: var(--bg-warm);
+            border-top: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 20px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .nav-btn svg {
+            width: 34px;
+            height: 34px;
+            fill: var(--text-high);
+        }
+
+        .nav-btn.active svg {
+            fill: var(--terracotta);
+        }
+
+        /* Sub-views */
+        .subview {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            gap: 14px;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .subview.active {
+            display: flex;
+        }
+
+        .view-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-high);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card {
+            background: var(--surface-card);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+        }
+
+        .btn-action {
+            width: 100%;
+            height: 48px;
+            background: var(--terracotta);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* SOS Alert Modal */
+        .modal {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 99;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-bezel">
+        <!-- SCREEN CONTENT -->
+        <div class="screen-content">
+
+            <!-- 1. HOME VIEW (Reference Mockup) -->
+            <div id="view-home" class="subview active">
+                <div>
+                    <h1 class="brand-title">Vyavahaar</h1>
+                    <p class="greeting" id="user-greeting">Namaste,<br>(Sharma Ji)</p>
+                </div>
+
+                <div class="sos-wrapper">
+                    <button class="btn-sos" onclick="triggerSos()">SOS</button>
+                    <div class="sos-status-pill">112 Direct</div>
+                </div>
+
+                <div class="mic-section">
+                    <button class="btn-mic" id="main-mic-btn" onclick="toggleVoiceAssistant()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                        </svg>
+                    </button>
+                    <p class="mic-prompt" id="mic-text">माइक दबाएं और बताएं आपको क्या चाहिए</p>
+
+                    <div class="voice-chips">
+                        <span class="chip" onclick="simulateVoice('Mujhe aaj ke satsang dikhao')">🕉️ Satsang</span>
+                        <span class="chip" onclick="simulateVoice('Mere liye cab book karo')">🚖 Cab</span>
+                        <span class="chip" onclick="simulateVoice('Ambulance chahiye')">🚑 Ambulance</span>
+                        <span class="chip" onclick="simulateVoice('Text size bada kar do')">🔍 Bada Text</span>
+                    </div>
+
+                    <div class="feedback-card" id="assistant-card">
+                        <strong style="color: var(--terracotta);">Vyavahaar Assistant:</strong>
+                        <p id="assistant-response-text" style="margin-top: 6px; font-size: 17px;"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. CARE / MOBILITY VIEW -->
+            <div id="view-care" class="subview">
+                <div class="view-title">
+                    <span>Gaadi v Aapatkaal</span>
+                </div>
+                <div class="card" style="border-left: 6px solid var(--sos-red);">
+                    <h3>🚑 Aapatkaleen Ambulance (112)</h3>
+                    <p style="margin: 6px 0; color: var(--text-med);">Direct 112 emergency dialer v Basic Life Support gaadi.</p>
+                    <button class="btn-action" style="background: var(--sos-red);" onclick="requestAmbulance()">Ambulance Bulaayein</button>
+                </div>
+
+                <div class="card" style="border-left: 6px solid var(--terracotta);">
+                    <h3>🚖 Senior Cab Booking</h3>
+                    <p style="margin: 6px 0; color: var(--text-med);">Mandir, hospital ya rishtedaar ke yahan jane ke liye cab.</p>
+                    <input type="text" id="cab-dest" value="Sri Ram Mandir" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin: 6px 0;">
+                    <button class="btn-action" onclick="requestCab()">Cab Book Karein</button>
+                </div>
+
+                <div class="card" id="transport-status-card" style="display: none;">
+                    <h4 id="transport-status-title" style="color: var(--green);">Status: Confirmed</h4>
+                    <p id="transport-driver-info" style="margin-top: 4px;"></p>
+                </div>
+            </div>
+
+            <!-- 3. EVENTS VIEW -->
+            <div id="view-events" class="subview">
+                <div class="view-title">
+                    <span>Karyakram & Milan</span>
+                </div>
+                <div id="events-list-container" style="display: flex; flex-direction: column; gap: 12px;">
+                    <p>Events load ho rahe hain...</p>
+                </div>
+            </div>
+
+            <!-- 4. SETTINGS VIEW -->
+            <div id="view-settings" class="subview">
+                <div class="view-title">
+                    <span>Settings & Sugamta</span>
+                </div>
+                <div class="card">
+                    <h4>Bhasha Chuniye (Language)</h4>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;">
+                        <button class="chip" style="flex:1" onclick="setLang('hi')">हिंदी</button>
+                        <button class="chip" style="flex:1" onclick="setLang('en')">English</button>
+                        <button class="chip" style="flex:1" onclick="setLang('kn')">ಕನ್ನಡ</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>Aksharon Ka Aakar (Font Size)</h4>
+                    <input type="range" min="1.0" max="1.5" step="0.1" value="1.15" style="width: 100%; margin-top: 10px;" oninput="changeFontSize(this.value)">
+                </div>
+
+                <div class="card">
+                    <h4>Din v Raat (Theme)</h4>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;">
+                        <button class="chip" style="flex:1" onclick="document.body.classList.remove('dark-mode')">☀️ Din (Light)</button>
+                        <button class="chip" style="flex:1" onclick="document.body.classList.add('dark-mode')">🌙 Raat (Dark)</button>
+                    </div>
+                </div>
+
+                <div class="card" style="border-left: 6px solid var(--green);">
+                    <h4>Traceable Medicine Search</h4>
+                    <input type="text" id="med-search-input" value="Metformin" style="width: 100%; padding: 8px; margin-top: 6px; border-radius: 8px; border: 1px solid #ccc;">
+                    <button class="btn-action" style="margin-top: 8px;" onclick="searchMed()">Dawai Khojein</button>
+                    <div id="med-search-res" style="margin-top: 8px; font-size: 14px;"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BOTTOM NAVIGATION -->
+        <div class="bottom-nav">
+            <!-- 1. Plus in Circle: Medical / Transport -->
+            <button class="nav-btn" onclick="switchTab('care')" title="Services">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+            </button>
+
+            <!-- 2. Calendar: Events -->
+            <button class="nav-btn" onclick="switchTab('events')" title="Events">
+                <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z"/></svg>
+            </button>
+
+            <!-- 3. Gear: Settings -->
+            <button class="nav-btn" onclick="switchTab('settings')" title="Settings">
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            </button>
+        </div>
+
+        <!-- EMERGENCY SOS MODAL -->
+        <div class="modal" id="sos-modal">
+            <div class="modal-box">
+                <div style="font-size: 48px;">🚨</div>
+                <h2 style="color: var(--sos-red); margin-top: 8px;">112 Aapatkaal Calling</h2>
+                <p style="margin: 12px 0; font-size: 17px; font-weight: 600;">Direct Emergency Number 112 ko call lagaya ja raha hai aur parivar ko location bheji ja rahi hai.</p>
+                <button class="btn-sos" style="width: 100%;" onclick="closeModal()">112 Call Karein</button>
+                <button style="margin-top: 10px; background: none; border: none; color: #666; font-size: 16px; cursor: pointer;" onclick="closeModal()">Wapas jayein</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isListening = false;
+        let token = "test_token";
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'hi-IN';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        async function simulateVoice(text) {
+            document.getElementById('mic-text').innerText = "सुन रहे हैं: " + text;
+            speak(text);
+
+            try {
+                const res = await fetch('/api/v1/assistant/process-command', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ transcript: text, detected_language: 'hi' })
+                });
+                const data = await res.json();
+                document.getElementById('assistant-card').classList.add('active');
+                document.getElementById('assistant-response-text').innerText = data.spoken_feedback;
+                speak(data.spoken_feedback);
+
+                if (data.intent === 'search_events') {
+                    setTimeout(() => switchTab('events'), 1200);
+                } else if (data.intent === 'request_ride') {
+                    setTimeout(() => switchTab('care'), 1200);
+                } else if (data.intent === 'send_sos_alert') {
+                    triggerSos();
+                } else if (data.intent === 'change_accessibility_settings') {
+                    if (data.tool_call?.parameters?.font_scale) {
+                        changeFontSize(data.tool_call.parameters.font_scale);
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function toggleVoiceAssistant() {
+            const btn = document.getElementById('main-mic-btn');
+            const prompt = document.getElementById('mic-text');
+            if (!isListening) {
+                isListening = true;
+                btn.classList.add('listening');
+                prompt.innerText = "सुन रहे हैं... कृपया बोलें";
+                speak("Ji kahiye, main sun raha hoon.");
+                setTimeout(() => {
+                    simulateVoice("Mujhe aaj ke satsang dikhao");
+                    btn.classList.remove('listening');
+                    isListening = false;
+                }, 2000);
+            } else {
+                isListening = false;
+                btn.classList.remove('listening');
+                prompt.innerText = "माइक दबाएं और बताएं आपको क्या चाहिए";
+            }
+        }
+
+        function triggerSos() {
+            document.getElementById('sos-modal').classList.add('active');
+            speak("112 emergency dialing shuru kar rahe hain.");
+        }
+
+        function closeModal() {
+            document.getElementById('sos-modal').classList.remove('active');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.subview').forEach(v => v.classList.remove('active'));
+            if (tab === 'home') document.getElementById('view-home').classList.add('active');
+            else if (tab === 'care') document.getElementById('view-care').classList.add('active');
+            else if (tab === 'events') {
+                document.getElementById('view-events').classList.add('active');
+                loadEvents();
+            } else if (tab === 'settings') document.getElementById('view-settings').classList.add('active');
+        }
+
+        async function loadEvents() {
+            const container = document.getElementById('events-list-container');
+            container.innerHTML = "Events load ho rahe hain...";
+            try {
+                const res = await fetch('/api/v1/events/');
+                const events = await res.json();
+                container.innerHTML = "";
+                events.forEach(ev => {
+                    const card = document.createElement('div');
+                    card.className = "card";
+                    card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="chip" style="background:#FFF3E0; color:#E65100;">${ev.category}</span>
+                            <span style="color:var(--green); font-weight:700; font-size:13px;">✓ Verified</span>
+                        </div>
+                        <h4 style="margin-top:6px; font-size:18px;">${ev.title}</h4>
+                        <p style="font-size:14px; color:var(--text-med); margin:4px 0;">${ev.description}</p>
+                        <p style="font-size:14px; font-weight:600; color:var(--terracotta);">📍 ${ev.venue_name}</p>
+                        <button class="btn-action" style="margin-top:8px;" onclick="registerEvent(${ev.id}, this)">Shamil Ho (Join)</button>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch(e) {
+                container.innerHTML = "<p>Events load karne mein samasya aayi.</p>";
+            }
+        }
+
+        async function registerEvent(id, btn) {
+            try {
+                const res = await fetch(`/api/v1/events/${id}/register`, { method: 'POST' });
+                const data = await res.json();
+                btn.style.background = "var(--green)";
+                btn.innerText = "✓ Registered";
+                speak("Aapka registration safaltapoorvak ho gaya hai.");
+            } catch(e) {
+                alert("Registration ho gaya!");
+            }
+        }
+
+        async function requestCab() {
+            const dest = document.getElementById('cab-dest').value;
+            const res = await fetch('/api/v1/transport/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ request_type: 'CAB', pickup_address: 'Home', destination_address: dest })
+            });
+            const data = await res.json();
+            const card = document.getElementById('transport-status-card');
+            card.style.display = 'block';
+            document.getElementById('transport-status-title').innerText = "Status: " + data.status;
+            document.getElementById('transport-driver-info').innerText = "Estimated Fare: ₹" + data.fare_estimate;
+            speak("Cab booking request darj kar li gayi hai.");
+        }
+
+        async function requestAmbulance() {
+            const res = await fetch('/api/v1/transport/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ request_type: 'AMBULANCE', pickup_address: 'Home', destination_address: 'Nearest Hospital' })
+            });
+            const data = await res.json();
+            const card = document.getElementById('transport-status-card');
+            card.style.display = 'block';
+            document.getElementById('transport-status-title').innerText = "Status: " + data.status + " (112 Alerted)";
+            document.getElementById('transport-driver-info').innerText = "Vehicle: " + (data.vehicle_model || "BLS Ambulance KA-01-EA-108");
+            speak("Ambulance dispatch ho chuki hai.");
+        }
+
+        async function searchMed() {
+            const q = document.getElementById('med-search-input').value;
+            const resContainer = document.getElementById('med-search-res');
+            resContainer.innerHTML = "Khoj rahe hain...";
+            try {
+                const res = await fetch(`/api/v1/prescriptions/medicines/search?q=${encodeURIComponent(q)}`);
+                const data = await res.json();
+                let html = `<p><strong>Salt:</strong> ${data.matched_salt}</p><ul style="margin: 6px 0 0 16px;">`;
+                data.verified_equivalents.forEach(eq => {
+                    html += `<li><strong>${eq.brand_name}</strong> - ₹${eq.approximate_price_inr} (${eq.manufacturer})</li>`;
+                });
+                html += `</ul><p style="font-size:12px; color:var(--terracotta); margin-top:4px;">${data.safety_disclaimer}</p>`;
+                resContainer.innerHTML = html;
+            } catch(e) {
+                resContainer.innerHTML = "<p>Koi traceable record nahi mila.</p>";
+            }
+        }
+
+        function changeFontSize(val) {
+            document.documentElement.style.setProperty('--font-scale', val);
+        }
+
+        function setLang(lang) {
+            speak(lang === 'hi' ? "Bhasha Hindi chuni gayi" : lang === 'en' ? "Language set to English" : "Bhashe Kannada");
+        }
+    </script>
+</body>
+</html>

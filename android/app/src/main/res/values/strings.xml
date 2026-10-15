@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Vyavahaar</string>
+    <string name="app_tagline">Aapke Vyavahar Mein Hi Humara Pyaar Hai</string>
+    <string name="welcome_title">Namaste</string>
+    <string name="welcome_subtitle">India\'s voice-first companion app for senior citizens.</string>
+    <string name="get_started">Get Started</string>
+    <string name="phone_label">Mobile Number</string>
+    <string name="send_otp">Send OTP</string>
+    <string name="verify_otp">Verify Code</string>
+    <string name="sos_label">SOS</string>
+    <string name="sos_calling_112">Calling 112 Emergency Services…</string>
+    <string name="mic_tap_prompt">Tap the microphone and tell me what you need</string>
+    <string name="mic_listening">Listening… Please speak</string>
+    <string name="events_tab">Events</string>
+    <string name="home_tab">Home</string>
+    <string name="settings_tab">Settings</string>
+    <string name="cab_ambulance">Travel &amp; Medical</string>
+    <string name="doctors_appointments">Doctor Visits</string>
+    <string name="prescriptions_medicines">Prescription &amp; Medicine</string>
+</resources>

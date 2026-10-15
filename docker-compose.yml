@@ -1,0 +1,24 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: vyavahaar-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DEV_MODE=True
+      - DEV_TEST_PHONE=+919876543210
+      - DEV_TEST_OTP=123456
+      - DATABASE_URL=sqlite:///./vyavahaar.db
+    volumes:
+      - backend-data:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  backend-data:

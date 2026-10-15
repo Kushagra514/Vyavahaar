@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">व्यवहार</string>
+    <string name="app_tagline">आपके व्यवहार में ही हमारा प्यार है</string>
+    <string name="welcome_title">नमस्ते</string>
+    <string name="welcome_subtitle">वरिष्ठ नागरिकों के लिए भारत का पहला आवाज़-आधारित साथी।</string>
+    <string name="get_started">आगे बढ़ें</string>
+    <string name="phone_label">मोबाइल नंबर</string>
+    <string name="send_otp">ओटीपी भेजें</string>
+    <string name="verify_otp">ओटीपी सत्यापित करें</string>
+    <string name="sos_label">SOS आपातकालीन</string>
+    <string name="sos_calling_112">112 आपातकालीन सेवा को कॉल कर रहे हैं…</string>
+    <string name="mic_tap_prompt">माइक दबाएं और बताएं आपको क्या चाहिए</string>
+    <string name="mic_listening">सुन रहे हैं… कृपया बोलें</string>
+    <string name="events_tab">कार्यक्रम</string>
+    <string name="home_tab">होम</string>
+    <string name="settings_tab">सेटिंग्स</string>
+    <string name="cab_ambulance">कैब व एम्बुलेंस</string>
+    <string name="doctors_appointments">डॉक्टर अपॉइंटमेंट</string>
+    <string name="prescriptions_medicines">दवाई व पर्ची</string>
+</resources>
