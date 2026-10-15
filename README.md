@@ -29,8 +29,9 @@
 | **Sandbox OTP Authentication** | **Implemented** | `backend/app/api/v1/endpoints/auth.py` (Fixed dev code `123456`) |
 | **Native Hindi/English TTS** | **Implemented** | `android/.../home/HomeViewModel.kt` (Android `TextToSpeech` engine) |
 | **Senior Compose Screens** | **Implemented** | `android/.../ui/screens/` (Home, Auth, Events, Transport, Prescriptions, etc.) |
-| **Live Android Audio Capture** | **Planned / Stubbed** | Android `SpeechRecognizer` listener to be wired in `HomeScreen.kt` |
-| **Prescription Camera Capture** | **Planned / Stubbed** | CameraX capture intent to be wired in `PrescriptionsScreen.kt` |
+| **Live Android Audio Capture** | **Implemented** | `android/.../home/HomeScreen.kt` (Android `SpeechRecognizer` Intent with Hindi/English) |
+| **Prescription Camera Capture** | **Implemented** | `android/.../prescriptions/PrescriptionsScreen.kt` (Camera capture with Base64 JPEG) |
+| **Continuous Integration (CI)**| **Implemented** | `.github/workflows/ci.yml` (Automated backend tests, smoke tests, and Gradle checks) |
 | **Cloud Speech / LLM API** | **Planned / Optional**| Google Cloud Speech & Gemini 1.5 Flash hooks in backend config |
 
 ### High-Level System Architecture

@@ -50,7 +50,7 @@
 | **Hyperlocal Events UI** | `IMPLEMENTED - UNVERIFIED` | `android/.../screens/events/EventsScreen.kt` | Satsang, Yoga, and Walk listings with filter chips and RSVP buttons. | API hooked to `EventsRepository.kt`. | Android Team |
 | **Transport & Ambulance UI** | `IMPLEMENTED - UNVERIFIED` | `android/.../screens/transport/TransportScreen.kt` | Cab quotation cards and 112 ambulance dispatch banners. | API hooked to `TransportRepository.kt`. | Android Team |
 | **Doctor Appointment UI** | `IMPLEMENTED - UNVERIFIED` | `android/.../screens/appointments/AppointmentsScreen.kt` | Recurrence selector (One-time, Weekly, Monthly) and doctor list. | API hooked to `AppointmentsRepository.kt`. | Android Team |
-| **Prescription & Medicine UI** | `IMPLEMENTED - UNVERIFIED` | `android/.../screens/prescriptions/PrescriptionsScreen.kt` | Salt information card, Janaushadhi alternative viewer, and search bar. | Real camera capture not wired (uses stub). | Android Team |
+| **Prescription & Medicine UI** | `IMPLEMENTED - UNVERIFIED` | `android/.../screens/prescriptions/PrescriptionsScreen.kt` | Salt information card, Janaushadhi alternative viewer, search bar, and camera capture wired via `ActivityResultContracts.TakePicturePreview()`. | Requires runtime verification on emulator/device. | Android Team |
 | **Contacts & Messaging UI** | `IMPLEMENTED - UNVERIFIED` | `android/.../screens/contacts/ContactsScreen.kt` | Big avatar cards with direct voice call and message buttons. | Telephony/Dialer integration unverified. | Android Team |
 | **Settings & Preferences UI** | `IMPLEMENTED - UNVERIFIED` | `android/.../screens/settings/SettingsScreen.kt` | Language switcher, font size slider, and logout confirmation. | Wired to Jetpack DataStore. | Android Team |
 
@@ -78,7 +78,7 @@
 | **Allowlisted Tool Dispatcher** | `VERIFIED` | `backend/app/services/voice_assistant.py#L11-L23` | Restricts voice execution to 11 safe functions; blocks arbitrary execution. | None. | AI Team |
 | **Consequential Action Confirmation** | `VERIFIED` | `backend/app/services/voice_assistant.py#L75-L77` | Cab booking and sensitive tools return `requires_confirmation=True`. | None. | AI Team |
 | **Android Text-to-Speech (TTS)** | `IMPLEMENTED - UNVERIFIED` | `android/.../screens/home/HomeViewModel.kt#L62-L72` | Configured with `Locale("hi", "IN")` via Android native `TextToSpeech`. | Device audio output unverified. | AI Team |
-| **Android Speech-to-Text (STT)** | `NOT STARTED` | `android/.../screens/home/HomeScreen.kt#L231` | Microphone click emits fixed test string. Native `SpeechRecognizer` missing. | Integration required. | Android / AI |
+| **Android Speech-to-Text (STT)** | `IMPLEMENTED - UNVERIFIED` | `android/.../screens/home/HomeScreen.kt` | Wired `RecognizerIntent.ACTION_RECOGNIZE_SPEECH` with Hindi (`hi-IN`) and English (`en-IN`/`en-US`) models; result fed to voice assistant API. | Requires emulator/device runtime test. | Android / AI |
 | **Cloud LLM (Gemini 1.5)** | `DEFERRED` | `backend/app/core/config.py#L23` | Placeholder setting present; local deterministic rule parser handles MVP. | API key required for free-form queries. | AI Team |
 
 ---
@@ -90,18 +90,18 @@
 | **Gradle Kotlin DSL JDK 25 Crash** | `HIGH` | Android Build | Run `./gradlew tasks` on Linux host with OpenJDK 25 installed. | Install OpenJDK 17 (`sudo apt install openjdk-17-jdk`) and point `JAVA_HOME`. | DevOps | Configure Gradle Toolchain or install JDK 17. |
 | **Missing Android SDK in CI/CLI** | `HIGH` | Android Build | Run `./gradlew assembleDebug` in CLI environment without Android SDK. | Use Android Studio IDE to download SDK 35 automatically. | Android Team | Document SDK installation steps in README. |
 | **ROS launch_testing Pytest Crash** | `MEDIUM` (Resolved) | Backend Tests | Run `pytest` on Ubuntu systems with ROS installed. Pytest auto-loads broken ROS plugins. | Run via `scripts/run_backend_tests.sh` with `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`. | DevOps | Add isolated test runner and document workaround. |
-| **SpeechRecognizer Unwired in UI** | `HIGH` | Android Voice Assistant | Tap microphone button on Home screen. | Currently supplies hardcoded mock query for verification. | Android Team | Wire Android `SpeechRecognizer` or Speech-to-Text Intent. |
-| **Prescription Camera Capture Stubbed** | `MEDIUM` | Android Prescriptions | Tap "Parchi Photo Scan Karein". | Uses fixed base64 placeholder string. | Android Team | Implement CameraX photo capture intent. |
+| **SpeechRecognizer Unwired in UI** | ~~`HIGH`~~ **RESOLVED** | Android Voice Assistant | Tap microphone button on Home screen. | Wired `RecognizerIntent.ACTION_RECOGNIZE_SPEECH` in `HomeScreen.kt` (commit `e25b731`). | Android Team | Verify on live emulator/device. |
+| **Prescription Camera Capture Stubbed** | ~~`MEDIUM`~~ **RESOLVED** | Android Prescriptions | Tap "Parchi Photo Scan Karein". | Wired `ActivityResultContracts.TakePicturePreview()` with JPEG Base64 encoding in `PrescriptionsScreen.kt` (commit `e25b731`). | Android Team | Verify on live emulator/device. |
 
 ---
 
 ## 5. Prioritized Next Actions
 
-1. **Resolve Local Android JDK 17 Environment**: Install JDK 17 and configure Android SDK 35 so `./gradlew assembleDebug` succeeds from the CLI.
-2. **Wire Native Android `SpeechRecognizer`**: Replace the stub in `HomeScreen.kt` with Android's built-in `RecognizerIntent.ACTION_RECOGNIZE_SPEECH` to capture live Hindi and English speech from the device microphone.
-3. **Verify Android App in Emulator**: Start Android Studio, boot an API 34/35 emulator, execute the debug build, and assert communication with `http://10.0.2.2:8000/`.
-4. **Implement CameraX Prescription Capture**: Integrate CameraX capture to provide actual prescription image uploads to `/api/v1/prescriptions/scan`.
-5. **Add GitHub Actions CI**: Set up automated workflow to run `scripts/run_backend_tests.sh` and Gradle lint checks on pull requests.
+1. **Verify Android App in Emulator** *(highest priority)*: Open `android/` in Android Studio, set Gradle JDK to `~/.jdks/openjdk-17`, boot an API 34/35 AVD, run the debug build, and confirm the Home screen loads and communicates with `http://10.0.2.2:8000/`.
+2. **Configure Android SDK for CLI Builds**: Set `ANDROID_HOME` to the Android Studio SDK path (`~/Android/Sdk` or equivalent). Document in README so `./gradlew assembleDebug` works from a terminal.
+3. **Test Live Hindi Voice Recognition**: On the running emulator/device, tap the microphone on the Home screen and dictate a Hindi phrase (e.g., *"sos"*). Verify the transcribed text routes to the backend `/api/v1/voice/process` and produces a spoken TTS response.
+4. **Resolve Pydantic v2 Deprecation Warnings**: Migrate class-based `class Config` inner classes to `model_config = ConfigDict(...)` across all backend schemas to suppress warnings and prepare for Pydantic v3 compatibility.
+5. **Wire Real OCR for Prescription Scan**: Replace the mock OCR pipeline in `backend/app/api/v1/endpoints/prescriptions.py` with Google Cloud Vision API or ML Kit On-Device Text Recognition (no API key required for ML Kit).
 
 ---
 
@@ -114,3 +114,11 @@
 * **Reproducibility Automation**: Created `scripts/run_backend_tests.sh`, `scripts/smoke_test.sh`, `backend/Dockerfile`, and `docker-compose.yml`.
 * **Security & Isolation**: Created root `.gitignore` protecting virtual environments, databases, and secrets.
 * **Status Established**: Authored `PROJECT_STATUS.md` as the definitive progress tracking system.
+
+### 2026-10-15 — Feature Integration, JDK Setup, and CI Pipeline
+* **JDK 17 Installed**: Eclipse Temurin `17.0.20.1+1` installed at `~/.jdks/openjdk-17`. Gradle 8.10.2 builds evaluated cleanly (`BUILD SUCCESSFUL in 1m 47s`).
+* **STT Wired**: `RecognizerIntent.ACTION_RECOGNIZE_SPEECH` integrated in `HomeScreen.kt` with Hindi (`hi-IN`) and English (`en-IN`/`en-US`) language models; voice result dispatched to backend NLU pipeline.
+* **Camera Wired**: `ActivityResultContracts.TakePicturePreview()` integrated in `PrescriptionsScreen.kt` with JPEG 85% quality + Base64 encoding; falls back gracefully if camera is unavailable.
+* **CI Pipeline Created**: `.github/workflows/ci.yml` added with two jobs — `backend-tests` (Python 3.12, pytest, smoke test) and `android-build-check` (JDK 17, Gradle tasks evaluation).
+* **Documentation Updated**: `README.md` capability table updated; `PROJECT_STATUS.md` executive summary and feature tracker refreshed to reflect completed integrations.
+* **Outstanding**: Android app unverified on live emulator; STT and camera integrations marked `IMPLEMENTED - UNVERIFIED` pending runtime confirmation.
