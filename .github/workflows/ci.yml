@@ -13,6 +13,15 @@ jobs:
   backend-tests:
     name: Backend API & NLU Test Suite
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      # Required so 'from app.xxx import ...' resolves correctly in all steps.
+      PYTHONPATH: "."
+      # Prevents any host-installed pytest plugins (e.g. ROS launch_testing)
+      # from auto-loading and crashing the test runner. Safe on all platforms.
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
 
     steps:
       - name: Checkout Repository
@@ -28,27 +37,18 @@ jobs:
       - name: Install Backend Dependencies
         run: |
           pip install --upgrade pip
-          pip install -r backend/requirements.txt
+          pip install -r requirements.txt
 
       - name: Initialize SQLite Database
-        working-directory: backend
         run: python app/db_init.py
 
       - name: Run Backend Automated Tests (Pytest)
-        working-directory: backend
-        env:
-          # Prevents any host-installed pytest plugins (e.g. ROS) from
-          # auto-loading and crashing the test runner. Safe on all platforms.
-          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
-          PYTHONPATH: "."
-        run: |
-          pytest tests/test_api.py -v -p asyncio
+        run: pytest tests/test_api.py -v -p asyncio
 
       - name: Start Backend for Smoke Test
-        working-directory: backend
         run: |
           uvicorn app.main:app --host 127.0.0.1 --port 8000 &
-          # Wait until the health endpoint is actually ready (up to 15s)
+          # Wait until health endpoint responds (up to 15s)
           for i in $(seq 1 15); do
             if curl -sf http://127.0.0.1:8000/health > /dev/null; then
               echo "Backend is up after ${i}s"
@@ -58,6 +58,7 @@ jobs:
           done
 
       - name: Run Live API Smoke Test
+        working-directory: "."
         run: bash scripts/smoke_test.sh http://127.0.0.1:8000
 
   # ─────────────────────────────────────────────────────────────────────────────
