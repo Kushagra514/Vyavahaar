@@ -9,10 +9,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import org.vyavahaar.app.data.local.PreferencesDataStore
 import org.vyavahaar.app.data.remote.AllowlistedToolCallDto
 import org.vyavahaar.app.data.remote.ApiClient
+import org.vyavahaar.app.data.remote.SosAlertRequestDto
 import org.vyavahaar.app.data.remote.VoiceCommandResponseDto
 import org.vyavahaar.app.data.repository.AssistantRepository
 import java.util.Locale
@@ -145,6 +147,43 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         onDirectCall(callIntent)
+    }
+
+    fun triggerSosAlertBackend(isTestMode: Boolean, onComplete: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val token = preferences.authToken.firstOrNull() ?: ""
+                val resp = ApiClient.apiService.triggerSosAlert(
+                    token = "Bearer $token",
+                    req = SosAlertRequestDto(
+                        isTestMode = isTestMode,
+                        emergencyType = if (isTestMode) "DEMO_TEST_SOS" else "GENERAL_SOS",
+                        locationName = "Bengaluru (Elder Residence)"
+                    )
+                )
+                if (resp.isSuccessful && resp.body() != null) {
+                    val alert = resp.body()!!
+                    val msg = if (alert.isTestMode) {
+                        "Test Mode SOS Safal: Caregiver alert payload generated (${alert.notifiedContactsCount} contacts)."
+                    } else {
+                        "Emergency SOS Alert bheja gaya: 112 aur parivar ko soochit kiya gaya."
+                    }
+                    _uiState.value = _uiState.value.copy(assistantFeedback = msg, statusMessage = alert.status)
+                    speak(msg)
+                    onComplete(alert.alertMessagePayload)
+                } else {
+                    val errMsg = "SOS server sampark vifal raha. Direct 112 dial karein."
+                    _uiState.value = _uiState.value.copy(assistantFeedback = errMsg)
+                    speak(errMsg)
+                    onComplete(errMsg)
+                }
+            } catch (e: Exception) {
+                val errMsg = "SOS alert error: ${e.localizedMessage}. Direct 112 dial karein."
+                _uiState.value = _uiState.value.copy(assistantFeedback = errMsg)
+                speak(errMsg)
+                onComplete(errMsg)
+            }
+        }
     }
 
     override fun onCleared() {

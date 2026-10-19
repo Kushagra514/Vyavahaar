@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -17,8 +17,7 @@ class ContactResponse(BaseModel):
     is_vyavahaar_user: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class MessageCreateRequest(BaseModel):
     receiver_id: int
@@ -34,5 +33,4 @@ class MessageResponse(BaseModel):
     delivery_status: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

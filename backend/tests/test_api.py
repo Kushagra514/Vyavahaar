@@ -196,3 +196,135 @@ def test_appointments_and_prescriptions():
     assert "Metformin" in med_data["matched_salt"]
     assert len(med_data["verified_equivalents"]) >= 2
     assert "Informational only" in med_data["safety_disclaimer"]
+
+def test_unauthorized_access_protection():
+    # Attempt to access protected endpoints without token
+    assert client.get("/api/v1/profile/").status_code == 401
+    assert client.get("/api/v1/events/").status_code == 401
+    assert client.get("/api/v1/transport/requests").status_code == 401
+    assert client.post("/api/v1/profile/sos-alert", json={"is_test_mode": True}).status_code == 401
+
+def test_sos_emergency_alert_safe_test_mode():
+    verify_resp = client.post("/api/v1/auth/verify-otp", json={"phone_number": "+919876543210", "otp_code": "123456"})
+    headers = {"Authorization": f"Bearer {verify_resp.json()['access_token']}"}
+
+    # First ensure at least one emergency contact is saved
+    client.post(
+        "/api/v1/profile/emergency-contacts",
+        headers=headers,
+        json={
+            "name": "Beti Priya",
+            "phone_number": "+919876543212",
+            "relationship_type": "Daughter",
+            "is_primary": True,
+            "can_view_location": True
+        }
+    )
+
+    # 1. Test in safe demonstration test mode (is_test_mode = True)
+    test_sos_resp = client.post(
+        "/api/v1/profile/sos-alert",
+        headers=headers,
+        json={
+            "is_test_mode": True,
+            "emergency_type": "GENERAL_SOS",
+            "location_latitude": 12.9716,
+            "location_longitude": 77.5946,
+            "location_name": "Cubbon Park, Bengaluru"
+        }
+    )
+    assert test_sos_resp.status_code == 200
+    sos_data = test_sos_resp.json()
+    assert sos_data["is_test_mode"] is True
+    assert sos_data["status"] == "SIMULATED_TEST_DISPATCHED"
+    assert sos_data["direct_call_target"] == "112"
+    assert sos_data["notified_contacts_count"] >= 1
+    assert "TEST MODE" in sos_data["alert_message_payload"]
+    assert "Cubbon Park" in sos_data["alert_message_payload"]
+
+    # 2. Test in live mode format
+    live_sos_resp = client.post(
+        "/api/v1/profile/sos-alert",
+        headers=headers,
+        json={
+            "is_test_mode": False,
+            "emergency_type": "MEDICAL_EMERGENCY",
+            "location_latitude": 12.9716,
+            "location_longitude": 77.5946,
+            "location_name": "Home, Indiranagar"
+        }
+    )
+    assert live_sos_resp.status_code == 200
+    assert live_sos_resp.json()["status"] == "ACTIVE_ALERT_DISPATCHED"
+
+def test_prescription_ocr_and_persistent_history():
+    import base64
+    verify_resp = client.post("/api/v1/auth/verify-otp", json={"phone_number": "+919876543210", "otp_code": "123456"})
+    headers = {"Authorization": f"Bearer {verify_resp.json()['access_token']}"}
+
+    # Encode a test prescription text into base64
+    sample_rx = (
+        "Rx: Dr. S. K. Gupta (MD)\n"
+        "Patient: Aadarniya Sadasya, 70/M\n"
+        "1. Tab Dolo 650mg - twice daily after meals\n"
+        "2. Tab Pan 40 - before breakfast\n"
+        "3. Tab Amlodipine 5mg - once daily morning"
+    )
+    b64_payload = base64.b64encode(sample_rx.encode("utf-8")).decode("utf-8")
+
+    # 1. Scan prescription
+    scan_resp = client.post(
+        "/api/v1/prescriptions/scan",
+        headers=headers,
+        json={"image_base64_or_url": b64_payload, "optional_doctor_hint": "Dr. S. K. Gupta"}
+    )
+    assert scan_resp.status_code == 200
+    scan_data = scan_resp.json()
+    assert scan_data["id"] is not None
+    assert "Dr. S. K. Gupta" in scan_data["doctor_name"]
+    assert scan_data["confidence_score"] >= 0.85
+    assert len(scan_data["extracted_medicines"]) >= 2
+    # Verify recognized medicines
+    names = [m["name"] for m in scan_data["extracted_medicines"]]
+    assert any("Dolo 650" in n or "Paracetamol" in n for n in names)
+    assert any("Pan 40" in n or "Pantoprazole" in n for n in names)
+
+    # 2. Retrieve history to verify persistence
+    list_resp = client.get("/api/v1/prescriptions/", headers=headers)
+    assert list_resp.status_code == 200
+    prescriptions = list_resp.json()
+    assert len(prescriptions) >= 1
+    assert prescriptions[0]["id"] == scan_data["id"]
+
+def test_event_rsvp_leave_cancellation():
+    verify_resp = client.post("/api/v1/auth/verify-otp", json={"phone_number": "+919876543210", "otp_code": "123456"})
+    headers = {"Authorization": f"Bearer {verify_resp.json()['access_token']}"}
+
+    events = client.get("/api/v1/events/", headers=headers).json()
+    event_id = events[0]["id"]
+
+    # Register first
+    reg_resp = client.post(f"/api/v1/events/{event_id}/register", headers=headers)
+    assert reg_resp.status_code == 200
+
+    # Cancel registration (leave event)
+    cancel_resp = client.delete(f"/api/v1/events/{event_id}/register", headers=headers)
+    assert cancel_resp.status_code == 200
+    assert "cancelled" in cancel_resp.json()["message"].lower()
+
+def test_edge_cases_and_error_handling():
+    # 1. Search for non-existent medicine
+    med_404 = client.get("/api/v1/prescriptions/medicines/search?q=NonExistentFictionalMed123")
+    assert med_404.status_code == 404
+    assert "satyapit jankaari nahi mili" in med_404.json()["detail"].lower()
+
+    # 2. Invalid transport type validation error (422)
+    verify_resp = client.post("/api/v1/auth/verify-otp", json={"phone_number": "+919876543210", "otp_code": "123456"})
+    headers = {"Authorization": f"Bearer {verify_resp.json()['access_token']}"}
+    bad_transport = client.post(
+        "/api/v1/transport/request",
+        headers=headers,
+        json={"request_type": "ROCKET_SHIP", "pickup_address": "Indiranagar", "destination_address": "Moon"}
+    )
+    assert bad_transport.status_code == 422
+

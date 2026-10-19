@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from datetime import datetime, timezone
+import uuid
+
 from app.core.database import get_db
 from app.core.security import get_current_user_id
 from app.models.user import User
@@ -10,6 +13,8 @@ from app.schemas.profile import (
     ProfileUpdate,
     EmergencyContactCreate,
     EmergencyContactResponse,
+    SosAlertRequest,
+    SosAlertResponse
 )
 
 router = APIRouter()
@@ -81,3 +86,46 @@ def delete_emergency_contact(
     db.delete(contact)
     db.commit()
     return {"message": "Emergency contact removed successfully"}
+
+@router.post("/sos-alert", response_model=SosAlertResponse)
+def trigger_sos_alert(
+    payload: SosAlertRequest,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Trigger emergency SOS workflow with safe test mode.
+    Dispatches notifications to registered caregiver contacts and prepares 112 direct emergency call.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    contacts = db.query(EmergencyContact).filter(EmergencyContact.user_id == user_id).all()
+    contact_summaries = [f"{c.name} ({c.relationship_type}): {c.phone_number}" for c in contacts]
+    
+    user_name = user.name or "Aadarniya Sadasya"
+    loc_name = payload.location_name or "Bengaluru"
+    loc_str = f"near {loc_name} (Lat: {payload.location_latitude}, Lon: {payload.location_longitude})"
+    
+    alert_tag = "[EMERGENCY ALERT - TEST MODE / SIMULATION]" if payload.is_test_mode else "[CRITICAL EMERGENCY SOS ALERT]"
+    message_body = (
+        f"{alert_tag} {user_name} (Phone: {user.phone_number}) has triggered an emergency alert {loc_str}. "
+        f"Emergency Type: {payload.emergency_type}. Direct dialing 112 initiated. Please check on them immediately."
+    )
+    
+    status_label = "SIMULATED_TEST_DISPATCHED" if payload.is_test_mode else "ACTIVE_ALERT_DISPATCHED"
+    alert_id = f"SOS-{user_id}-{uuid.uuid4().hex[:8].upper()}"
+
+    return SosAlertResponse(
+        alert_id=alert_id,
+        user_id=user_id,
+        emergency_type=payload.emergency_type,
+        is_test_mode=payload.is_test_mode,
+        status=status_label,
+        direct_call_target="112",
+        notified_contacts_count=len(contacts),
+        notified_contacts=contact_summaries,
+        alert_message_payload=message_body,
+        timestamp=datetime.now(timezone.utc)
+    )

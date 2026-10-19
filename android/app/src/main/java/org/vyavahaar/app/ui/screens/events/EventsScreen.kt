@@ -191,23 +191,44 @@ fun EventsScreen(
                                 Spacer(modifier = Modifier.height(16.dp))
 
                                 if (ev.isRegistered) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(vertical = 8.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.CheckCircle,
-                                            contentDescription = null,
-                                            tint = ForestGreen,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(
-                                            text = "Aap registered hain (Registered)",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            color = ForestGreen,
-                                            fontWeight = FontWeight.Bold
-                                        )
+                                    Column {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.padding(vertical = 4.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.CheckCircle,
+                                                contentDescription = null,
+                                                tint = ForestGreen,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = "Aap registered hain (Registered)",
+                                                style = MaterialTheme.typography.titleMedium,
+                                                color = ForestGreen,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        OutlinedButton(
+                                            onClick = {
+                                                coroutineScope.launch {
+                                                    val res = eventsRepo.unregisterFromEvent(ev.id)
+                                                    res.onSuccess {
+                                                        actionStatusMessage = "Karyakram se naam hata diya gaya hai."
+                                                        loadEvents()
+                                                    }.onFailure {
+                                                        actionStatusMessage = "Karyakram hatane mein truti: ${it.localizedMessage}"
+                                                    }
+                                                }
+                                            },
+                                            shape = RoundedCornerShape(12.dp),
+                                            colors = ButtonDefaults.outlinedButtonColors(contentColor = SosCrimson),
+                                            modifier = Modifier.fillMaxWidth().height(48.dp)
+                                        ) {
+                                            Text("Karyakram Chhodein (Cancel RSVP)", fontWeight = FontWeight.Bold)
+                                        }
                                     }
                                 } else {
                                     VyavahaarButton(

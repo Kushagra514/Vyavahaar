@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
@@ -70,6 +71,29 @@ fun PrescriptionsScreen(
         }
     }
 
+    fun runSampleOcrDemo() {
+        isLoading = true
+        coroutineScope.launch {
+            val sampleRx = (
+                "Rx: Dr. A. K. Sharma (MD Internal Med)\n" +
+                "Patient: Aadarniya Sadasya, Age 68\n" +
+                "1. Tab Metformin 500mg SR - twice daily after meals\n" +
+                "2. Tab Amlodipine 5mg - once daily morning\n" +
+                "3. Tab Pan 40 - before breakfast\n" +
+                "Follow up in 2 weeks."
+            )
+            val b64 = Base64.encodeToString(sampleRx.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+            val res = prescriptionRepo.scanPrescription(b64)
+            isLoading = false
+            res.onSuccess {
+                scanResult = it
+                Toast.makeText(context, "Sample Prescription OCR Safal!", Toast.LENGTH_SHORT).show()
+            }.onFailure {
+                Toast.makeText(context, "Scan vifal: ${it.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     Scaffold(
         topBar = { VyavahaarTopBar(title = "Dawai & Parchi Jankaari", onBackClick = onBack) },
         containerColor = WarmCreamBackground
@@ -80,7 +104,7 @@ fun PrescriptionsScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            // Camera Scan Button for Prescription Photo
+            // Camera Scan Card for Prescription Photo
             Card(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = WarmCardSurface),
@@ -94,22 +118,32 @@ fun PrescriptionsScreen(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Parchi ki saaf photo lein aur dawaiyon ke naam dekhein.", style = MaterialTheme.typography.bodyMedium, color = TextMediumContrast)
                     Spacer(modifier = Modifier.height(12.dp))
-                    VyavahaarButton(
-                        text = if (isLoading) "Scan ho raha hai..." else "Parchi Photo Scan Karein",
-                        onClick = {
-                            try {
-                                cameraLauncher.launch(null)
-                            } catch (e: Exception) {
-                                Toast.makeText(context, "Camera uplabdh nahi hai. Sample demo scan kar rahe hain.", Toast.LENGTH_SHORT).show()
-                                isLoading = true
-                                coroutineScope.launch {
-                                    val res = prescriptionRepo.scanPrescription("sample_prescription_base64_payload")
-                                    isLoading = false
-                                    res.onSuccess { scanResult = it }
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(
+                            onClick = {
+                                try {
+                                    cameraLauncher.launch(null)
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, "Camera uplabdh nahi hai. Sample demo run kar rahe hain.", Toast.LENGTH_SHORT).show()
+                                    runSampleOcrDemo()
                                 }
-                            }
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary),
+                            modifier = Modifier.weight(1f).height(48.dp),
+                            enabled = !isLoading
+                        ) {
+                            Text(if (isLoading) "Scan..." else "Camera Scan", fontWeight = FontWeight.Bold)
                         }
-                    )
+                        OutlinedButton(
+                            onClick = { runSampleOcrDemo() },
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.weight(1f).height(48.dp),
+                            enabled = !isLoading
+                        ) {
+                            Text("🧪 Sample Demo", fontWeight = FontWeight.Bold)
+                        }
+                    }
                 }
             }
 
@@ -125,6 +159,9 @@ fun PrescriptionsScreen(
                         coroutineScope.launch {
                             val res = prescriptionRepo.searchMedicine(searchQuery)
                             res.onSuccess { searchResult = it }
+                               .onFailure {
+                                   Toast.makeText(context, "Dawai nahi mili: ${it.localizedMessage}", Toast.LENGTH_SHORT).show()
+                               }
                         }
                     }) {
                         Icon(Icons.Default.Search, contentDescription = "Search")
@@ -136,64 +173,130 @@ fun PrescriptionsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Display OCR Scan Results if available
-            if (scanResult != null) {
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = WarmCardSurface),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Warning, contentDescription = null, tint = TerracottaPrimary)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Parchi OCR Transcription (Provisional)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(scanResult!!.extractedRawText, style = MaterialTheme.typography.bodyMedium)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Card(colors = CardDefaults.cardColors(containerColor = SosCrimsonContainer)) {
-                            Text(
-                                text = scanResult!!.medicalSafetyWarning,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = SosCrimson,
-                                modifier = Modifier.padding(10.dp),
-                                fontWeight = FontWeight.SemiBold
-                            )
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                // Display OCR Scan Results if available
+                if (scanResult != null) {
+                    item {
+                        Card(
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = WarmCardSurface),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "OCR Natije (${scanResult!!.doctorName ?: "Doctor Parchi"})",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TerracottaPrimary
+                                    )
+                                    AssistChip(
+                                        onClick = {},
+                                        label = { Text("${(scanResult!!.confidenceScore * 100).toInt()}% Vishwas") }
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = scanResult!!.extractedRawText,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextMediumContrast
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // List of extracted medicine cards with one-tap alternative search
+                                scanResult!!.extractedMedicines.forEach { med ->
+                                    Card(
+                                        shape = RoundedCornerShape(10.dp),
+                                        colors = CardDefaults.cardColors(containerColor = WarmCreamBackground),
+                                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth().padding(10.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Column(modifier = Modifier.weight(1f)) {
+                                                Text(med.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                                Text(
+                                                    text = "${med.formulation} • ${med.strength ?: ""} • ${med.instructions ?: ""}",
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = TextMediumContrast
+                                                )
+                                            }
+                                            TextButton(
+                                                onClick = {
+                                                    val queryWord = med.name.split(" ").firstOrNull() ?: med.name
+                                                    searchQuery = queryWord
+                                                    coroutineScope.launch {
+                                                        val res = prescriptionRepo.searchMedicine(queryWord)
+                                                        res.onSuccess { searchResult = it }
+                                                    }
+                                                }
+                                            ) {
+                                                Text("Saste Vikalp Khojein", color = ForestGreen, fontWeight = FontWeight.Bold)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Card(colors = CardDefaults.cardColors(containerColor = SosCrimsonContainer)) {
+                                    Text(
+                                        text = scanResult!!.medicalSafetyWarning,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = SosCrimson,
+                                        modifier = Modifier.padding(10.dp),
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+                            }
                         }
                     }
                 }
-            }
 
-            // Display Medicine Info & Generic Alternatives
-            if (searchResult != null) {
-                Spacer(modifier = Modifier.height(16.dp))
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Display Medicine Info & Generic Alternatives
+                if (searchResult != null) {
                     item {
-                        Text(
-                            text = "Dawai Salt: ${searchResult!!.matchedSalt}",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = searchResult!!.safetyDisclaimer,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = TerracottaDark
-                        )
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = ForestGreen.copy(alpha = 0.1f)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(
+                                    text = "Satyapit Salt: ${searchResult!!.matchedSalt}",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = ForestGreen
+                                )
+                                Text(
+                                    text = searchResult!!.safetyDisclaimer,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextMediumContrast
+                                )
+                            }
+                        }
                     }
+
                     items(searchResult!!.verifiedEquivalents) { alt ->
                         Card(
                             shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(containerColor = WarmCardSurface)
+                            colors = CardDefaults.cardColors(containerColor = WarmCardSurface),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
+                            Column(modifier = Modifier.padding(14.dp)) {
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                     Text(alt.brandName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                     Text("₹${alt.approximatePriceInr}", style = MaterialTheme.typography.titleMedium, color = ForestGreen, fontWeight = FontWeight.Bold)
                                 }
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text("Salt: ${alt.activeIngredient} (${alt.strength})", style = MaterialTheme.typography.bodyMedium)
                                 Text("Nirmata: ${alt.manufacturer} • ${alt.dosageForm}", style = MaterialTheme.typography.bodySmall, color = TextMediumContrast)
-                                Text("Note: ${alt.clinicalNote}", style = MaterialTheme.typography.bodySmall, color = TextHighContrast)
+                                Text("Jankaari: ${alt.clinicalNote}", style = MaterialTheme.typography.bodySmall, color = TextHighContrast)
                             }
                         }
                     }

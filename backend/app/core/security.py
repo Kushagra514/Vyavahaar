@@ -32,8 +32,6 @@ def get_current_user_id(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_scheme)
 ) -> int:
     if not credentials:
-        if settings.DEV_MODE:
-            return 1
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication credentials were not provided",
@@ -42,8 +40,6 @@ def get_current_user_id(
     token = credentials.credentials
     user_id_str = decode_access_token(token)
     if not user_id_str:
-        if settings.DEV_MODE:
-            return 1
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",

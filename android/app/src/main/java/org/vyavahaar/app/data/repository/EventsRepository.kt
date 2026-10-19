@@ -37,4 +37,18 @@ class EventsRepository(
             Result.failure(e)
         }
     }
+
+    suspend fun unregisterFromEvent(eventId: Int): Result<Unit> {
+        return try {
+            val token = preferences.authToken.firstOrNull() ?: ""
+            val response = api.unregisterFromEvent("Bearer $token", eventId)
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception(response.errorBody()?.string() ?: "Failed to cancel event registration"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

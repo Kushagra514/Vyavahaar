@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
 class Settings(BaseSettings):
@@ -23,8 +23,6 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: Optional[str] = None
     FIREBASE_PROJECT_ID: Optional[str] = None
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
 settings = Settings()

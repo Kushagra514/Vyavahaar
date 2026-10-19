@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 
 class MedicineItem(BaseModel):
@@ -27,6 +27,8 @@ class PrescriptionResponse(BaseModel):
         "Never modify dosages or substitute medications without direct confirmation from your treating physician or a licensed pharmacist."
     )
 
+    model_config = ConfigDict(from_attributes=True)
+
 class MedicineAlternative(BaseModel):
     brand_name: str
     active_ingredient: str
@@ -36,6 +38,8 @@ class MedicineAlternative(BaseModel):
     approximate_price_inr: float
     is_same_salt: bool = True
     clinical_note: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 class MedicineSearchResponse(BaseModel):
     searched_query: str
@@ -47,3 +51,5 @@ class MedicineSearchResponse(BaseModel):
     safety_disclaimer: str = (
         "Informational only. Equivalent medicines contain the same active salt, but bio-equivalence, excipients, and release mechanisms vary. Always consult your doctor or chemist before changing brands."
     )
+
+    model_config = ConfigDict(from_attributes=True)

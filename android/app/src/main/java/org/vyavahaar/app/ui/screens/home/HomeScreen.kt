@@ -55,6 +55,9 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
+    var showSosDialog by remember { mutableStateOf(false) }
+    var sosAlertDetails by remember { mutableStateOf<String?>(null) }
+
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -211,11 +214,7 @@ fun HomeScreen(
 
             // Upper-middle: Red SOS Button matching reference screenshot
             Button(
-                onClick = {
-                    viewModel.triggerSos { intent ->
-                        context.startActivity(intent)
-                    }
-                },
+                onClick = { showSosDialog = true },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SosCrimson,
@@ -418,6 +417,107 @@ fun HomeScreen(
                 dismissButton = {
                     TextButton(onClick = { viewModel.dismissAssistant() }) {
                         Text("Radd karein (Cancel)", color = TextHighContrast)
+                    }
+                }
+            )
+        }
+
+        // Accidental-Trigger Protected Emergency SOS Dialog
+        if (showSosDialog) {
+            AlertDialog(
+                onDismissRequest = { showSosDialog = false },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = SosCrimson)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Aapatkaal (Emergency SOS)",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = SosCrimson
+                        )
+                    }
+                },
+                text = {
+                    Column {
+                        Text(
+                            text = "Aap aapatkaal sahayata chun rahe hain. Kripya apna vikalp chunein:",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = {
+                                showSosDialog = false
+                                viewModel.triggerSos { intent -> context.startActivity(intent) }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = SosCrimson),
+                            modifier = Modifier.fillMaxWidth().height(48.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("🚨 112 Direct Call Lagayein", fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Button(
+                            onClick = {
+                                showSosDialog = false
+                                viewModel.triggerSosAlertBackend(isTestMode = false) { details ->
+                                    sosAlertDetails = details
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary),
+                            modifier = Modifier.fillMaxWidth().height(48.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("📢 Contacts Ko Alert Bhejein", fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        OutlinedButton(
+                            onClick = {
+                                showSosDialog = false
+                                viewModel.triggerSosAlertBackend(isTestMode = true) { details ->
+                                    sosAlertDetails = details
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth().height(48.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("🧪 Safe Demo / Test Mode", fontWeight = FontWeight.Bold)
+                        }
+                    }
+                },
+                confirmButton = {},
+                dismissButton = {
+                    TextButton(onClick = { showSosDialog = false }) {
+                        Text("Radd Karein (Cancel)", color = TextHighContrast)
+                    }
+                }
+            )
+        }
+
+        // Safe Demo / SOS Alert Dispatch Details Feedback Dialog
+        if (sosAlertDetails != null) {
+            AlertDialog(
+                onDismissRequest = { sosAlertDetails = null },
+                title = {
+                    Text(
+                        text = "SOS Alert Summary",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = ForestGreen
+                    )
+                },
+                text = {
+                    Text(
+                        text = sosAlertDetails!!,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { sosAlertDetails = null },
+                        colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
+                    ) {
+                        Text("Theek Hai (OK)")
                     }
                 }
             )

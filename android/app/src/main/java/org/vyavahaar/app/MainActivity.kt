@@ -5,15 +5,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.flow.firstOrNull
 import org.vyavahaar.app.data.local.PreferencesDataStore
 import org.vyavahaar.app.navigation.Screen
 import org.vyavahaar.app.navigation.VyavahaarNavGraph
+import org.vyavahaar.app.theme.TerracottaPrimary
+import org.vyavahaar.app.theme.WarmCreamBackground
 import org.vyavahaar.app.theme.VyavahaarTheme
 
 class MainActivity : ComponentActivity() {
@@ -29,8 +34,20 @@ class MainActivity : ComponentActivity() {
         setContent {
             val fontScale by preferences.fontScale.collectAsState(initial = 1.2f)
             val themeMode by preferences.themeMode.collectAsState(initial = "light")
-            val token by preferences.authToken.collectAsState(initial = null)
-            val isOnboarded by preferences.isOnboarded.collectAsState(initial = false)
+
+            var authChecked by remember { mutableStateOf(false) }
+            var startDestination by remember { mutableStateOf(Screen.Login.route) }
+
+            LaunchedEffect(Unit) {
+                val token = preferences.authToken.firstOrNull()
+                val isOnboarded = preferences.isOnboarded.firstOrNull() ?: false
+                startDestination = if (!token.isNullOrBlank() && isOnboarded) {
+                    Screen.Home.route
+                } else {
+                    Screen.Login.route
+                }
+                authChecked = true
+            }
 
             val isDarkTheme = when (themeMode) {
                 "dark" -> true
@@ -42,17 +59,18 @@ class MainActivity : ComponentActivity() {
                 darkTheme = isDarkTheme,
                 fontScale = fontScale
             ) {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    val navController = rememberNavController()
-                    val startDestination = if (token != null && isOnboarded) {
-                        Screen.Home.route
+                Surface(modifier = Modifier.fillMaxSize(), color = WarmCreamBackground) {
+                    if (!authChecked) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = TerracottaPrimary)
+                        }
                     } else {
-                        Screen.Login.route
+                        val navController = rememberNavController()
+                        VyavahaarNavGraph(
+                            navController = navController,
+                            startDestination = startDestination
+                        )
                     }
-                    VyavahaarNavGraph(
-                        navController = navController,
-                        startDestination = startDestination
-                    )
                 }
             }
         }

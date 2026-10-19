@@ -42,6 +42,19 @@ interface VyavahaarApiService {
         @Path("id") eventId: Int
     ): Response<EventRegistrationResponseDto>
 
+    @DELETE("api/v1/events/{id}/register")
+    suspend fun unregisterFromEvent(
+        @Header("Authorization") token: String,
+        @Path("id") eventId: Int
+    ): Response<Map<String, String>>
+
+    // Emergency SOS Alert
+    @POST("api/v1/profile/sos-alert")
+    suspend fun triggerSosAlert(
+        @Header("Authorization") token: String,
+        @Body req: SosAlertRequestDto
+    ): Response<SosAlertResponseDto>
+
     // Transport & SOS
     @POST("api/v1/transport/request")
     suspend fun createTransportRequest(

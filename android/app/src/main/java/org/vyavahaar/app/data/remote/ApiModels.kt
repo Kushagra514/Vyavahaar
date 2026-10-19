@@ -175,3 +175,25 @@ data class ContactDto(
     @SerializedName("avatar_color") val avatarColor: String,
     @SerializedName("is_favorite") val isFavorite: Boolean
 )
+
+data class SosAlertRequestDto(
+    @SerializedName("is_test_mode") val isTestMode: Boolean = false,
+    @SerializedName("emergency_type") val emergencyType: String = "GENERAL_SOS",
+    @SerializedName("location_latitude") val locationLatitude: Double = 12.9716,
+    @SerializedName("location_longitude") val locationLongitude: Double = 77.5946,
+    @SerializedName("location_name") val locationName: String = "Bengaluru"
+)
+
+data class SosAlertResponseDto(
+    @SerializedName("alert_id") val alertId: String,
+    @SerializedName("user_id") val userId: Int,
+    @SerializedName("emergency_type") val emergencyType: String,
+    @SerializedName("is_test_mode") val isTestMode: Boolean,
+    @SerializedName("status") val status: String,
+    @SerializedName("direct_call_target") val directCallTarget: String,
+    @SerializedName("notified_contacts_count") val notifiedContactsCount: Int,
+    @SerializedName("notified_contacts") val notifiedContacts: List<String>,
+    @SerializedName("alert_message_payload") val alertMessagePayload: String,
+    @SerializedName("timestamp") val timestamp: String
+)
+

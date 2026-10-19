@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 
@@ -19,8 +19,7 @@ class EventResponse(BaseModel):
     capacity: int
     is_registered: bool = False
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class EventRegistrationResponse(BaseModel):
     id: int
@@ -30,5 +29,4 @@ class EventRegistrationResponse(BaseModel):
     registered_at: datetime
     message: str = "Aapka registration safaltapoorvak ho gaya hai."
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
