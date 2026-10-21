@@ -404,7 +404,6 @@
                     <div style="display: flex; gap: 8px; margin-top: 8px;">
                         <button class="chip" style="flex:1" onclick="setLang('hi')">हिंदी</button>
                         <button class="chip" style="flex:1" onclick="setLang('en')">English</button>
-                        <button class="chip" style="flex:1" onclick="setLang('kn')">ಕನ್ನಡ</button>
                     </div>
                 </div>
 
@@ -463,30 +462,90 @@
 
     <script>
         let isListening = false;
-        let token = "test_token";
+        let token = null;
+        let activeRecognition = null;
+
+        // Auto-authenticate with dev credentials on page load
+        async function initAuth() {
+            try {
+                await fetch('/api/v1/auth/request-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone_number: '+919876543210' })
+                });
+                const resp = await fetch('/api/v1/auth/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone_number: '+919876543210', otp_code: '123456' })
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    token = data.access_token;
+                    console.log('[Auth] Demo token obtained successfully.');
+                } else {
+                    console.error('[Auth] OTP verify failed:', resp.status);
+                }
+            } catch (e) {
+                console.error('[Auth] initAuth error:', e);
+            }
+        }
+        window.addEventListener('DOMContentLoaded', initAuth);
 
         function speak(text) {
+            if (!text || typeof text !== 'string') return;
             if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'hi-IN';
+                utterance.onerror = (e) => console.warn('[TTS] error:', e.error);
                 window.speechSynthesis.speak(utterance);
             }
         }
 
         async function simulateVoice(text) {
-            document.getElementById('mic-text').innerText = "सुन रहे हैं: " + text;
-            speak(text);
+            if (!text || !text.trim()) {
+                document.getElementById('mic-text').innerText = 'Kuch suna nahi. Dobara bolen.';
+                return;
+            }
+
+            document.getElementById('mic-text').innerText = '🎙️ Suna: ' + text;
+            document.getElementById('assistant-card').classList.add('active');
+            document.getElementById('assistant-response-text').innerText = '⏳ Jawab dhundh raha hoon...';
+
+            if (!token) {
+                document.getElementById('assistant-response-text').innerText = '⚠️ Session suru ho raha hai, thodi der mein dobara koshish karein.';
+                // Retry auth once
+                await initAuth();
+                if (!token) return;
+            }
 
             try {
+                console.log('[Voice] Sending transcript:', text);
                 const res = await fetch('/api/v1/assistant/process-command', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
                     body: JSON.stringify({ transcript: text, detected_language: 'hi' })
                 });
+
                 const data = await res.json();
-                document.getElementById('assistant-card').classList.add('active');
-                document.getElementById('assistant-response-text').innerText = data.spoken_feedback;
-                speak(data.spoken_feedback);
+                console.log('[Voice] Response status:', res.status, 'data:', data);
+
+                if (!res.ok) {
+                    const errMsg = data.detail || ('HTTP ' + res.status + ' error');
+                    document.getElementById('assistant-response-text').innerText = '⚠️ ' + errMsg;
+                    speak('Kuch gadbad hui. ' + errMsg);
+                    return;
+                }
+
+                const feedback = (data.spoken_feedback && typeof data.spoken_feedback === 'string' && data.spoken_feedback.trim())
+                    ? data.spoken_feedback
+                    : 'Jawab nahi mila. Dobara prayas karein.';
+
+                document.getElementById('assistant-response-text').innerText = feedback;
+                speak(feedback);
 
                 if (data.intent === 'search_events') {
                     setTimeout(() => switchTab('events'), 1200);
@@ -500,28 +559,77 @@
                     }
                 }
             } catch (e) {
-                console.error(e);
+                console.error('[Voice] Network error:', e);
+                document.getElementById('assistant-response-text').innerText = '⚠️ Network error. Internet connection check karein.';
+                speak('Network mein samasya hai. Dobara koshish karein.');
             }
         }
 
         function toggleVoiceAssistant() {
             const btn = document.getElementById('main-mic-btn');
             const prompt = document.getElementById('mic-text');
-            if (!isListening) {
-                isListening = true;
-                btn.classList.add('listening');
-                prompt.innerText = "सुन रहे हैं... कृपया बोलें";
-                speak("Ji kahiye, main sun raha hoon.");
-                setTimeout(() => {
-                    simulateVoice("Mujhe aaj ke satsang dikhao");
-                    btn.classList.remove('listening');
-                    isListening = false;
-                }, 2000);
-            } else {
+
+            // Stop any active recognition session first
+            if (isListening && activeRecognition) {
+                activeRecognition.stop();
+                activeRecognition = null;
                 isListening = false;
                 btn.classList.remove('listening');
-                prompt.innerText = "माइक दबाएं और बताएं आपको क्या चाहिए";
+                prompt.innerText = 'माइक दबाएं और बताएं आपको क्या चाहिए';
+                return;
             }
+
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRec) {
+                prompt.innerText = 'Is browser mein mic samarthan nahi hai. Neeche chips use karein.';
+                speak('Is browser mein bol ke baat karna sambhav nahi hai. Neechay chips use karein.');
+                return;
+            }
+
+            isListening = true;
+            btn.classList.add('listening');
+            prompt.innerText = 'सुन रहे हैं... कृपया बोलें';
+            speak('Ji kahiye, main sun raha hoon.');
+
+            const recognition = new SpeechRec();
+            recognition.lang = 'hi-IN';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            activeRecognition = recognition;
+
+            recognition.onresult = (e) => {
+                const transcript = e.results[0][0].transcript;
+                console.log('[Speech] Transcript:', transcript, 'confidence:', e.results[0][0].confidence);
+                isListening = false;
+                btn.classList.remove('listening');
+                activeRecognition = null;
+                simulateVoice(transcript);
+            };
+
+            recognition.onerror = (e) => {
+                console.error('[Speech] Error:', e.error);
+                isListening = false;
+                btn.classList.remove('listening');
+                activeRecognition = null;
+                const msgs = {
+                    'no-speech': 'Kuch suna nahi. Dobara mic dbayen aur bolen.',
+                    'not-allowed': 'Mic ki anumati nahi mili. Browser settings mein mic allow karein.',
+                    'network': 'Network samasya ke karan aawaz nahi pehchani gayi.',
+                    'aborted': 'Aawaz input band kar di gayi.'
+                };
+                prompt.innerText = msgs[e.error] || ('Aawaz error: ' + e.error);
+            };
+
+            recognition.onend = () => {
+                if (isListening) {
+                    isListening = false;
+                    btn.classList.remove('listening');
+                    activeRecognition = null;
+                    prompt.innerText = 'माइक दबाएं और बताएं आपको क्या चाहिए';
+                }
+            };
+
+            recognition.start();
         }
 
         function triggerSos() {
@@ -634,7 +742,7 @@
         }
 
         function setLang(lang) {
-            speak(lang === 'hi' ? "Bhasha Hindi chuni gayi" : lang === 'en' ? "Language set to English" : "Bhashe Kannada");
+            speak(lang === 'hi' ? 'Bhasha Hindi chuni gayi' : 'Language set to English');
         }
     </script>
 </body>

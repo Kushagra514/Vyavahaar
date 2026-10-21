@@ -42,6 +42,7 @@ from fastapi.responses import FileResponse
 import os
 
 @app.get("/", include_in_schema=False)
+@app.get("/demo", include_in_schema=False)
 @app.get("/preview", include_in_schema=False)
 def serve_preview():
     static_file = os.path.join(os.path.dirname(__file__), "static", "index.html")
