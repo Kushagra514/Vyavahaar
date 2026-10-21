@@ -5,6 +5,29 @@ set -e
 # Validates running backend service, authentication, and core API workflows.
 
 BASE_URL="${1:-http://127.0.0.1:8000}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+BACKEND_DIR="$PROJECT_ROOT/backend"
+
+SPAWNED_SERVER=0
+if ! curl -s "$BASE_URL/health" > /dev/null 2>&1; then
+    echo "Notice: No server running at $BASE_URL. Auto-starting local instance for smoke test..."
+    cd "$BACKEND_DIR"
+    if [ -d "venv" ]; then
+        # shellcheck disable=SC1091
+        source venv/bin/activate
+    fi
+    python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > /dev/null 2>&1 &
+    SERVER_PID=$!
+    SPAWNED_SERVER=1
+    trap 'if [ $SPAWNED_SERVER -eq 1 ]; then kill $SERVER_PID 2>/dev/null || true; wait $SERVER_PID 2>/dev/null || true; fi' EXIT INT TERM
+    for _ in {1..40}; do
+        if curl -s "$BASE_URL/health" > /dev/null 2>&1; then
+            break
+        fi
+        sleep 0.2
+    done
+fi
 
 echo "=========================================================="
 echo " Starting Vyavahaar API Smoke Test against: $BASE_URL"

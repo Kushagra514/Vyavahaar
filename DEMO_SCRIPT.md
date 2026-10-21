@@ -59,7 +59,7 @@ curl -s http://127.0.0.1:8000/health
      * Observe two-step confirmation modal: *"Kya aap Mandir ke liye cab book karna chahte hain?"*
      * Demonstrate that consequential actions prevent accidental elder bookings.
 * **Expected Output:**
-  * Spoken audio synthesis via native TTS (`Locale("hi", "IN")`).
+  * Spoken audio synthesis via native TTS (`Locale("hi", "IN")` with `Locale("en", "IN")` fallback).
   * Structured tool execution via `voice_assistant.py` with zero cloud latency.
 
 ---

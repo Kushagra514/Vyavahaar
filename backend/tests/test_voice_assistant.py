@@ -98,12 +98,17 @@ def test_voice_rejection_cancellation(auth_header):
     data = resp.json()
     assert data["intent"] == "cancel_action"
 
-def test_voice_kannada_unsupported_rejection(auth_header):
-    # Constraint: Kannada must be rejected politely
+@pytest.mark.parametrize("unsupported_text", [
+    "Kannada bhasha mein bolo",
+    "Bengali te bolun",
+    "Tamil bhashaiyil pesavum"
+])
+def test_voice_unsupported_language_rejection(auth_header, unsupported_text):
+    # Constraint: Only Hindi, English, and Hinglish supported; other regional languages rejected politely
     resp = client.post(
         "/api/v1/assistant/process-command",
         headers=auth_header,
-        json={"transcript": "Kannada bhasha mein bolo"}
+        json={"transcript": unsupported_text}
     )
     assert resp.status_code == 200
     data = resp.json()

@@ -298,7 +298,9 @@ fun HomeScreen(
                     .clickable {
                         if (uiState.isListening) {
                             viewModel.dismissAssistant()
-                        } else {
+                        } else if (uiState.voiceState == VoiceAssistantState.IDLE || 
+                                   uiState.voiceState == VoiceAssistantState.ERROR || 
+                                   uiState.voiceState == VoiceAssistantState.RESPONDING) {
                             launchSpeechRecognition()
                         }
                     }
@@ -402,13 +404,19 @@ fun HomeScreen(
                                         "scan_prescription" -> onNavigateToPrescriptions()
                                         "start_call" -> onNavigateToContacts()
                                         "change_accessibility_settings" -> onNavigateToSettings()
+                                        "send_sos_alert" -> { showSosDialog = true }
                                         else -> viewModel.dismissAssistant()
                                     }
                                 },
                                 shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (uiState.activeToolCall?.toolName == "send_sos_alert") SosCrimson else TerracottaPrimary
+                                )
                             ) {
-                                Text("Aage badhein (Open)")
+                                Text(
+                                    text = if (uiState.activeToolCall?.toolName == "send_sos_alert") "🚨 Aapatkaal SOS Kholein" else "Aage badhein (Open)",
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
                     }

@@ -189,7 +189,7 @@ fun PrescriptionsScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "OCR Natije (${scanResult!!.doctorName ?: "Doctor Parchi"})",
+                                        text = "OCR Natije (Doctor Parchi)",
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = TerracottaPrimary
