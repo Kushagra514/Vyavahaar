@@ -1,12 +1,17 @@
 package org.vyavahaar.app.ui.screens.home
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
 import android.speech.RecognizerIntent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -57,6 +62,7 @@ fun HomeScreen(
 
     var showSosDialog by remember { mutableStateOf(false) }
     var sosAlertDetails by remember { mutableStateOf<String?>(null) }
+    var showPermissionRationaleDialog by remember { mutableStateOf(false) }
 
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -68,14 +74,14 @@ fun HomeScreen(
             if (!spokenText.isNullOrBlank()) {
                 viewModel.stopListeningAndProcess(spokenText)
             } else {
-                viewModel.dismissAssistant()
+                viewModel.onSpeechSilence()
             }
         } else {
             viewModel.dismissAssistant()
         }
     }
 
-    fun launchSpeechRecognition() {
+    fun startSpeechRecognitionIntent() {
         viewModel.startListening()
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -89,8 +95,31 @@ fun HomeScreen(
         try {
             speechRecognizerLauncher.launch(intent)
         } catch (e: Exception) {
-            Toast.makeText(context, "Voice input not supported on this device. Using demo mode.", Toast.LENGTH_SHORT).show()
-            viewModel.stopListeningAndProcess("Mujhe aaj ke satsang dikhao")
+            Toast.makeText(context, "Aawaz input is device par uplabdh nahi hai.", Toast.LENGTH_SHORT).show()
+            viewModel.onSpeechError("Voice input not supported on this device.")
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            startSpeechRecognitionIntent()
+        } else {
+            showPermissionRationaleDialog = true
+            viewModel.onPermissionDenied()
+        }
+    }
+
+    fun launchSpeechRecognition() {
+        val permissionCheck = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.RECORD_AUDIO
+        )
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            startSpeechRecognitionIntent()
+        } else {
+            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         }
     }
 
@@ -415,8 +444,47 @@ fun HomeScreen(
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { viewModel.dismissAssistant() }) {
+                    TextButton(onClick = { viewModel.cancelConsequentialAction() }) {
                         Text("Radd karein (Cancel)", color = TextHighContrast)
+                    }
+                }
+            )
+        }
+
+        // Microphone Permission Rationale Dialog
+        if (showPermissionRationaleDialog) {
+            AlertDialog(
+                onDismissRequest = { showPermissionRationaleDialog = false },
+                title = {
+                    Text(
+                        text = "Microphone Ki Anumati Chahiye",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Aapki aawaz se madad karne ke liye Vyavahaar ko microphone ki anumati ki aavashyakta hai. Kripya app settings mein permission on karein.",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showPermissionRationaleDialog = false
+                            val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.fromParts("package", context.packageName, null)
+                            }
+                            context.startActivity(appSettingsIntent)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
+                    ) {
+                        Text("Settings Kholein", fontWeight = FontWeight.Bold)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showPermissionRationaleDialog = false }) {
+                        Text("Theek hai (Dismiss)", color = TextHighContrast)
                     }
                 }
             )

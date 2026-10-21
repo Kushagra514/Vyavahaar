@@ -19,18 +19,31 @@ import org.vyavahaar.app.data.remote.VoiceCommandResponseDto
 import org.vyavahaar.app.data.repository.AssistantRepository
 import java.util.Locale
 
+enum class VoiceAssistantState {
+    IDLE,
+    LISTENING,
+    TRANSCRIBING,
+    INTERPRETING,
+    AWAITING_CONFIRMATION,
+    EXECUTING,
+    RESPONDING,
+    ERROR
+}
+
 data class HomeUiState(
     val userName: String = "Sadasya",
     val preferredLanguage: String = "hi",
     val fontScale: Float = 1.2f,
-    val isListening: Boolean = false,
+    val voiceState: VoiceAssistantState = VoiceAssistantState.IDLE,
     val recognizedTranscript: String = "",
     val assistantFeedback: String = "",
     val activeToolCall: AllowlistedToolCallDto? = null,
     val showConfirmationDialog: Boolean = false,
     val confirmationPrompt: String = "",
     val statusMessage: String = "Sabhi sevaayein taiyaar hain (All services ready)"
-)
+) {
+    val isListening: Boolean get() = voiceState == VoiceAssistantState.LISTENING
+}
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -64,7 +77,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private fun initTts() {
         tts = TextToSpeech(getApplication()) { status ->
             if (status == TextToSpeech.SUCCESS) {
-                tts?.language = Locale("hi", "IN")
+                // Tiered Fallback: hi-IN -> en-IN -> en-US/ENGLISH
+                val hiResult = tts?.setLanguage(Locale("hi", "IN"))
+                if (hiResult == TextToSpeech.LANG_MISSING_DATA || hiResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    val enInResult = tts?.setLanguage(Locale("en", "IN"))
+                    if (enInResult == TextToSpeech.LANG_MISSING_DATA || enInResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        tts?.language = Locale.ENGLISH
+                    }
+                }
             }
         }
     }
@@ -74,29 +94,52 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun startListening() {
+        // Prevent acoustic feedback echo: stop TTS engine before opening mic
+        tts?.stop()
+
         _uiState.value = _uiState.value.copy(
-            isListening = true,
+            voiceState = VoiceAssistantState.LISTENING,
             recognizedTranscript = "",
             assistantFeedback = "Suniye, main sun raha hoon... (Listening...)",
             statusMessage = "Listening..."
         )
-        speak("Ji kahiye, main sun raha hoon.")
     }
 
     fun stopListeningAndProcess(spokenText: String) {
+        // Stop any active TTS
+        tts?.stop()
+
+        val trimmed = spokenText.trim()
+        val lower = trimmed.lowercase(Locale.ROOT)
+
+        // If awaiting confirmation, process affirmative / negation responses directly
+        if (_uiState.value.voiceState == VoiceAssistantState.AWAITING_CONFIRMATION || _uiState.value.showConfirmationDialog) {
+            val affirmativeWords = listOf("haan", "ha", "yes", "theek hai", "confirm", "kar do", "aage badho", "ok")
+            val negativeWords = listOf("nahi", "na", "no", "cancel", "mat karo", "rok do", "band karo")
+
+            if (affirmativeWords.any { lower.contains(it) }) {
+                confirmConsequentialAction()
+                return
+            } else if (negativeWords.any { lower.contains(it) }) {
+                cancelConsequentialAction()
+                return
+            }
+        }
+
         _uiState.value = _uiState.value.copy(
-            isListening = false,
-            recognizedTranscript = spokenText,
+            voiceState = VoiceAssistantState.INTERPRETING,
+            recognizedTranscript = trimmed,
             statusMessage = "Anurodh samajh rahe hain... (Interpreting request...)"
         )
 
         viewModelScope.launch {
-            val result = assistantRepo.processVoiceCommand(spokenText)
+            val result = assistantRepo.processVoiceCommand(trimmed)
             result.onSuccess { response ->
                 handleAssistantResponse(response)
             }.onFailure { error ->
                 val fallbackMsg = "Kshama karein, network error aayi. Kripya punah prayas karein."
                 _uiState.value = _uiState.value.copy(
+                    voiceState = VoiceAssistantState.ERROR,
                     assistantFeedback = fallbackMsg,
                     statusMessage = "Sampark nahi ho saka"
                 )
@@ -109,38 +152,89 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         speak(resp.spokenFeedback)
         if (resp.toolCall != null && resp.toolCall.requiresConfirmation) {
             _uiState.value = _uiState.value.copy(
+                voiceState = VoiceAssistantState.AWAITING_CONFIRMATION,
                 assistantFeedback = resp.spokenFeedback,
                 activeToolCall = resp.toolCall,
                 showConfirmationDialog = true,
-                confirmationPrompt = resp.toolCall.confirmationPrompt ?: resp.spokenFeedback
+                confirmationPrompt = resp.toolCall.confirmationPrompt ?: resp.spokenFeedback,
+                statusMessage = "Pushti ka intezaar hai (Confirmation required)"
             )
         } else {
             _uiState.value = _uiState.value.copy(
+                voiceState = VoiceAssistantState.RESPONDING,
                 assistantFeedback = resp.spokenFeedback,
                 activeToolCall = resp.toolCall,
-                showConfirmationDialog = false
+                showConfirmationDialog = false,
+                statusMessage = "Anurodh poora hua (Request completed)"
             )
         }
     }
 
     fun confirmConsequentialAction() {
-        _uiState.value = _uiState.value.copy(showConfirmationDialog = false)
         val feedback = "Karya safaltapoorvak aage badha diya gaya hai."
-        _uiState.value = _uiState.value.copy(assistantFeedback = feedback)
+        _uiState.value = _uiState.value.copy(
+            voiceState = VoiceAssistantState.RESPONDING,
+            showConfirmationDialog = false,
+            assistantFeedback = feedback,
+            statusMessage = "Pushti safal"
+        )
         speak(feedback)
     }
 
-    fun dismissAssistant() {
+    fun cancelConsequentialAction() {
+        val feedback = "Theek hai, karya radd kar diya gaya hai."
         _uiState.value = _uiState.value.copy(
-            isListening = false,
+            voiceState = VoiceAssistantState.IDLE,
+            showConfirmationDialog = false,
+            activeToolCall = null,
+            assistantFeedback = feedback,
+            statusMessage = "Radd kiya gaya"
+        )
+        speak(feedback)
+    }
+
+    fun onPermissionDenied() {
+        val msg = "Aawaz suvidha ke liye microphone ki anumati avashyak hai."
+        _uiState.value = _uiState.value.copy(
+            voiceState = VoiceAssistantState.ERROR,
+            assistantFeedback = msg,
+            statusMessage = "Microphone anumati asweekar"
+        )
+    }
+
+    fun onSpeechSilence() {
+        val msg = "Aapki aawaz nahi sunai di. Kripya punah prayas karein."
+        _uiState.value = _uiState.value.copy(
+            voiceState = VoiceAssistantState.IDLE,
+            assistantFeedback = msg,
+            statusMessage = "Taiyaar"
+        )
+        speak(msg)
+    }
+
+    fun onSpeechError(error: String) {
+        val msg = "Aawaz input mein samasya: $error"
+        _uiState.value = _uiState.value.copy(
+            voiceState = VoiceAssistantState.ERROR,
+            assistantFeedback = msg,
+            statusMessage = "Aawaz asafal"
+        )
+    }
+
+    fun dismissAssistant() {
+        tts?.stop()
+        _uiState.value = _uiState.value.copy(
+            voiceState = VoiceAssistantState.IDLE,
             activeToolCall = null,
             showConfirmationDialog = false,
             recognizedTranscript = "",
-            assistantFeedback = ""
+            assistantFeedback = "",
+            statusMessage = "Sabhi sevaayein taiyaar hain"
         )
     }
 
     fun triggerSos(onDirectCall: (Intent) -> Unit) {
+        tts?.stop()
         speak("112 emergency dialing shuru kar rahe hain.")
         val callIntent = Intent(Intent.ACTION_DIAL).apply {
             data = Uri.parse("tel:112")

@@ -7,7 +7,7 @@
 
 ## 1. Project Overview
 
-**Vyavahaar** empowers Indian senior citizens to interact with modern mobile capabilities independently through natural spoken regional languages (Hindi, English, Kannada) without feeling intimidated by small text, confusing menus, complex passwords, or technical jargon.
+**Vyavahaar** empowers Indian senior citizens to interact with modern mobile capabilities independently through natural spoken languages (Hindi, English, Hinglish) without feeling intimidated by small text, confusing menus, complex passwords, or technical jargon.
 
 ### Target Users & Accessibility Goals
 * **Target Audience**: Indian senior citizens ($60+$ years) who may have mild visual impairment, reduced motor dexterity, or hesitation with complex English-heavy mobile interfaces.
@@ -56,7 +56,7 @@ flowchart TD
     subgraph BackendAPI["Vyavahaar Backend API (FastAPI + Python 3.12/3.14)"]
         Main["FastAPI Router & Lifespan\n(app.main:app)"]
         AuthService["Dev Sandbox / JWT Auth\n(OTP: 123456)"]
-        NLUService["Multilingual NLU Parser\n(Hindi / Hinglish / Kannada)"]
+        NLUService["Multilingual NLU Parser\n(Hindi / Hinglish / English)"]
         EventService["Community Events\n(Satsang, Yoga, Health Camps)"]
         TransportService["Transport State Machine\n(Cab Quotes & BLS Ambulance)"]
         HealthService["Indian Medicine Catalog\n(Authentic Salts & Janaushadhi)"]

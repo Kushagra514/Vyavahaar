@@ -19,5 +19,5 @@ export PYTHONPATH="."
 export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
 
 echo "==> Running Vyavahaar Backend API Automated Test Suite..."
-pytest tests/test_api.py -v -p asyncio "$@"
+pytest tests/ -v -p asyncio "$@"
 echo "==> All backend tests passed successfully!"
