@@ -1,11 +1,13 @@
 package org.vyavahaar.app.ui.screens.settings
 
+import android.content.res.Configuration
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import java.util.Locale
 import org.vyavahaar.app.data.local.PreferencesDataStore
 import org.vyavahaar.app.data.remote.ApiClient
 import org.vyavahaar.app.data.repository.AuthRepository
@@ -49,19 +52,19 @@ fun SettingsScreen(
         selectedTheme = currentTheme
     }
 
-    Scaffold(
-        topBar = { VyavahaarTopBar(title = "Settings & Accessibility", onBackClick = onBack) },
+        Scaffold(
+        topBar = { VyavahaarTopBar(title = "सेटिंग्स और पहुँच", onBackClick = onBack) },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
+                .padding(innerPadding)
                 .padding(20.dp)
         ) {
             Text(
-                text = "Sugamta & Suvidha (Accessibility)",
+                text = "सुगमता और सुविधा (पहुँच)",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = TextHighContrast
@@ -75,14 +78,17 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Bhasha Chuniye (Select Language)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("भाषा चुनें (Select Language)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(
                             selected = selectedLang == "hi",
                             onClick = {
                                 selectedLang = "hi"
-                                coroutineScope.launch { preferences.saveAccessibilitySettings(selectedLang, fontScale, voiceSpeed, selectedTheme) }
+                                coroutineScope.launch {
+                                    preferences.saveAccessibilitySettings(selectedLang, fontScale, voiceSpeed, selectedTheme)
+                                    updateAppLocale(context, selectedLang)
+                                }
                             },
                             label = { Text("हिंदी (Hindi)") }
                         )
@@ -90,17 +96,12 @@ fun SettingsScreen(
                             selected = selectedLang == "en",
                             onClick = {
                                 selectedLang = "en"
-                                coroutineScope.launch { preferences.saveAccessibilitySettings(selectedLang, fontScale, voiceSpeed, selectedTheme) }
+                                coroutineScope.launch {
+                                    preferences.saveAccessibilitySettings(selectedLang, fontScale, voiceSpeed, selectedTheme)
+                                    updateAppLocale(context, selectedLang)
+                                }
                             },
                             label = { Text("English") }
-                        )
-                        FilterChip(
-                            selected = selectedLang == "kn",
-                            onClick = {
-                                selectedLang = "kn"
-                                coroutineScope.launch { preferences.saveAccessibilitySettings(selectedLang, fontScale, voiceSpeed, selectedTheme) }
-                            },
-                            label = { Text("ಕನ್ನಡ (Kannada)") }
                         )
                     }
                 }
@@ -115,7 +116,7 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Aksharon Ka Aakar (Text Size)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("अक्षरों का आकार (टेक्स्ट साइज़)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Slider(
                         value = fontScale,
@@ -127,7 +128,7 @@ fun SettingsScreen(
                         steps = 2
                     )
                     Text(
-                        text = "Namuna: Yeh aakar kaisa lag raha hai?",
+                        text = "नमूना: यह आकार कैसा लग रहा है?",
                         style = MaterialTheme.typography.bodyLarge.copy(fontSize = (18 * fontScale).sp),
                         color = TerracottaPrimary
                     )
@@ -143,7 +144,7 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Theme (Light / Dark Mode)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("थीम (लाइट / डार्क मोड)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(
@@ -180,10 +181,23 @@ fun SettingsScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = SosCrimson),
                 modifier = Modifier.fillMaxWidth().height(52.dp)
             ) {
-                Icon(Icons.Default.ExitToApp, contentDescription = null)
+                Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Logout Karein (Sign Out)", fontWeight = FontWeight.Bold)
+                Text("लॉगआउट करें (साइन आउट)", fontWeight = FontWeight.Bold)
             }
         }
     }
+}
+
+private fun updateAppLocale(context: android.content.Context, languageCode: String) {
+    val locale = Locale(languageCode)
+    Locale.setDefault(locale)
+    val config = Configuration()
+    config.setLocale(locale)
+    context.createConfigurationContext(config)
+    val resources = context.resources
+    val dm = resources.displayMetrics
+    val conf = resources.configuration
+    conf.setLocale(locale)
+    resources.updateConfiguration(conf, dm)
 }

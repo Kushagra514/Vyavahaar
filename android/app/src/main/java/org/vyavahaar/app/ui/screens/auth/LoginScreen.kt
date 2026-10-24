@@ -1,6 +1,5 @@
 package org.vyavahaar.app.ui.screens.auth
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.vyavahaar.app.R
@@ -36,7 +36,7 @@ fun LoginScreen(
     var devHint by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
-        topBar = { VyavahaarTopBar(title = "Vyavahaar Pravesh") },
+        topBar = { VyavahaarTopBar(title = "व्यवहार प्रवेश") },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
@@ -47,21 +47,24 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            // Hero block: app name + one-line purpose
             Text(
-                text = "Namaste!",
+                text = "व्यवहार",
                 style = MaterialTheme.typography.headlineLarge,
                 color = TextHighContrast,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Kripya apna mobile number darj karein.",
+                text = "आपके मोबाइल नंबर से सुरक्षित और सरल प्रवेश।",
                 style = MaterialTheme.typography.bodyLarge,
-                color = TextMediumContrast
+                color = TextMediumContrast,
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // ONE input: phone number (label above the field, not in placeholder)
             OutlinedTextField(
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
@@ -70,12 +73,12 @@ fun LoginScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 singleLine = true,
                 textStyle = MaterialTheme.typography.titleLarge,
-                shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth()
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
             )
 
             if (errorMessage != null) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = errorMessage!!,
                     color = SosCrimson,
@@ -83,20 +86,11 @@ fun LoginScreen(
                 )
             }
 
-            if (devHint != null) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = devHint!!,
-                    color = ForestGreen,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            Spacer(modifier = Modifier.height(24.dp))
 
-            Spacer(modifier = Modifier.height(28.dp))
-
+            // ONE full-width primary CTA (min 56dp, TerracottaPrimary via VyavahaarButton)
             VyavahaarButton(
-                text = if (isLoading) "Bhej rahe hain..." else stringResource(R.string.send_otp),
+                text = if (isLoading) "भेज रहे हैं..." else stringResource(R.string.send_otp),
                 enabled = phoneNumber.length >= 10 && !isLoading,
                 onClick = {
                     isLoading = true
@@ -114,6 +108,16 @@ fun LoginScreen(
                     }
                 }
             )
+
+            if (devHint != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = devHint!!,
+                    color = ForestGreen,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }

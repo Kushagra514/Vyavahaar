@@ -17,9 +17,12 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -60,9 +63,62 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
+    // String resources for non-Composable lambdas
+    val homeFindEvents = stringResource(R.string.home_find_events)
+    val homeBookCab = stringResource(R.string.home_book_cab)
+    val homeCallContact = stringResource(R.string.home_call_contact)
+    val eventsTab = stringResource(R.string.events_tab)
+    val cabAmbulance = stringResource(R.string.cab_ambulance)
+    val contactsCall = stringResource(R.string.contacts_call)
+
     var showSosDialog by remember { mutableStateOf(false) }
     var sosAlertDetails by remember { mutableStateOf<String?>(null) }
     var showPermissionRationaleDialog by remember { mutableStateOf(false) }
+
+    // Helper: open an installed ride-hailing app (Uber -> Rapido -> Ola), fallback to Transport screen
+    val launchRideApp = {
+        val ridePackages = listOf("com.ubercab", "com.rapido.passenger", "com.olacabs.consumer")
+        var launched = false
+        for (pkg in ridePackages) {
+            val launchIntent = context.packageManager.getLaunchIntentForPackage(pkg)
+            if (launchIntent != null) {
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(launchIntent)
+                launched = true
+                break
+            }
+        }
+        if (!launched) onNavigateToTransport()
+    }
+
+    // Auto-redirect after a recognized voice intent (brief pause so spoken feedback starts first)
+    LaunchedEffect(uiState.voiceState, uiState.activeToolCall, uiState.showConfirmationDialog) {
+        val toolCall = uiState.activeToolCall
+        if (toolCall != null &&
+            uiState.voiceState == VoiceAssistantState.RESPONDING &&
+            !uiState.showConfirmationDialog
+        ) {
+            kotlinx.coroutines.delay(1500)
+            when (toolCall.toolName) {
+                "search_events" -> onNavigateToEvents()
+                "request_ride" -> {
+                    val requestType = toolCall.parameters["request_type"]?.toString()
+                    if (requestType == "CAB") {
+                        launchRideApp()
+                    } else {
+                        onNavigateToTransport()
+                    }
+                }
+                "schedule_appointment" -> onNavigateToAppointments()
+                "scan_prescription", "search_medicine_information" -> onNavigateToPrescriptions()
+                "start_call" -> onNavigateToContacts()
+                "change_accessibility_settings" -> onNavigateToSettings()
+                "send_sos_alert" -> showSosDialog = true
+                else -> { }
+            }
+            viewModel.dismissToolCall()
+        }
+    }
 
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -212,30 +268,31 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Top Header: "Vyavahaar" in bold, then "Namaste, (user Name)"
+            // Top Header: app name + elder greeting
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "Vyavahaar",
+                    text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineLarge,
                     color = TextHighContrast,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "Namaste,\n${uiState.userName}",
+                    text = "${stringResource(R.string.home_greeting)}\n${if (uiState.userName == "Sadasya") stringResource(R.string.welcome_title) else uiState.userName}",
                     style = MaterialTheme.typography.titleLarge,
                     color = TextHighContrast,
                     fontWeight = FontWeight.Medium,
-                    lineHeight = 28.sp
+                    lineHeight = 30.sp
                 )
             }
 
@@ -259,10 +316,10 @@ fun HomeScreen(
                     }
             ) {
                 Text(
-                    text = "SOS",
+                    text = stringResource(R.string.sos_label),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = 2.sp
+                    letterSpacing = 0.sp
                 )
             }
 
@@ -278,14 +335,14 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "112 Direct",
+                    text = stringResource(R.string.sos_calling_112),
                     style = MaterialTheme.typography.labelSmall,
                     color = SosCrimson,
                     fontWeight = FontWeight.Bold
                 )
             }
 
-            Spacer(modifier = Modifier.weight(1.0f))
+            Spacer(modifier = Modifier.height(36.dp))
 
             // Center: Large Push-to-Talk Microphone Button (Matching orange-yellow circle)
             Box(
@@ -340,24 +397,24 @@ fun HomeScreen(
             // Voice command chips for quick senior access
             Spacer(modifier = Modifier.height(16.dp))
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 AssistChip(
-                    onClick = { viewModel.stopListeningAndProcess("Mujhe aaj ke satsang dikhao") },
-                    label = { Text("Satsang", style = MaterialTheme.typography.bodyMedium) },
+                    onClick = { viewModel.stopListeningAndProcess(homeFindEvents) },
+                    label = { Text(eventsTab, style = MaterialTheme.typography.bodyMedium) },
                     leadingIcon = { Icon(Icons.Default.DateRange, contentDescription = null, Modifier.size(18.dp)) }
                 )
-                Spacer(modifier = Modifier.width(8.dp))
                 AssistChip(
-                    onClick = { viewModel.stopListeningAndProcess("Cab book karo") },
-                    label = { Text("Cab", style = MaterialTheme.typography.bodyMedium) },
+                    onClick = { viewModel.stopListeningAndProcess(homeBookCab) },
+                    label = { Text(cabAmbulance, style = MaterialTheme.typography.bodyMedium) },
                     leadingIcon = { Icon(Icons.Default.DirectionsCar, contentDescription = null, Modifier.size(18.dp)) }
                 )
-                Spacer(modifier = Modifier.width(8.dp))
                 AssistChip(
-                    onClick = { viewModel.stopListeningAndProcess("Call my daughter") },
-                    label = { Text("Call Beti", style = MaterialTheme.typography.bodyMedium) },
+                    onClick = { viewModel.stopListeningAndProcess(homeCallContact) },
+                    label = { Text(contactsCall, style = MaterialTheme.typography.bodyMedium) },
                     leadingIcon = { Icon(Icons.Default.Call, contentDescription = null, Modifier.size(18.dp)) }
                 )
             }
@@ -381,7 +438,7 @@ fun HomeScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Vyavahaar Assistant",
+                                text = stringResource(R.string.app_name) + " " + stringResource(R.string.home_voice_assistant),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = TerracottaPrimary
@@ -414,7 +471,9 @@ fun HomeScreen(
                                 )
                             ) {
                                 Text(
-                                    text = if (uiState.activeToolCall?.toolName == "send_sos_alert") "🚨 Aapatkaal SOS Kholein" else "Aage badhein (Open)",
+                                    text = if (uiState.activeToolCall?.toolName == "send_sos_alert") 
+                                        stringResource(R.string.home_emergency_help) 
+                                        else stringResource(R.string.common_ok) + " (" + stringResource(R.string.home_open) + ")",
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -423,7 +482,7 @@ fun HomeScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1.0f))
+            Spacer(modifier = Modifier.height(28.dp))
         }
 
         // Consequential Action Confirmation Dialog
@@ -432,7 +491,7 @@ fun HomeScreen(
                 onDismissRequest = { viewModel.dismissAssistant() },
                 title = {
                     Text(
-                        text = "Kripya pushti karein (Confirmation)",
+                        text = stringResource(R.string.home_confirm),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -448,12 +507,12 @@ fun HomeScreen(
                         onClick = { viewModel.confirmConsequentialAction() },
                         colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
                     ) {
-                        Text("Haan, aage badhein (Yes, Proceed)", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.common_yes) + ", " + stringResource(R.string.common_ok), fontWeight = FontWeight.Bold)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.cancelConsequentialAction() }) {
-                        Text("Radd karein (Cancel)", color = TextHighContrast)
+                        Text(stringResource(R.string.common_cancel), color = TextHighContrast)
                     }
                 }
             )
@@ -465,14 +524,14 @@ fun HomeScreen(
                 onDismissRequest = { showPermissionRationaleDialog = false },
                 title = {
                     Text(
-                        text = "Microphone Ki Anumati Chahiye",
+                        text = stringResource(R.string.common_permission_needed),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                 },
                 text = {
                     Text(
-                        text = "Aapki aawaz se madad karne ke liye Vyavahaar ko microphone ki anumati ki aavashyakta hai. Kripya app settings mein permission on karein.",
+                        text = stringResource(R.string.common_grant_permission),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 },
@@ -487,12 +546,12 @@ fun HomeScreen(
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
                     ) {
-                        Text("Settings Kholein", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.settings_open), fontWeight = FontWeight.Bold)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showPermissionRationaleDialog = false }) {
-                        Text("Theek hai (Dismiss)", color = TextHighContrast)
+                        Text(stringResource(R.string.common_cancel), color = TextHighContrast)
                     }
                 }
             )
@@ -506,18 +565,18 @@ fun HomeScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Warning, contentDescription = null, tint = SosCrimson)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Aapatkaal (Emergency SOS)",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = SosCrimson
-                        )
+                            Text(
+                                text = stringResource(R.string.home_sos_alert),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = SosCrimson
+                            )
                     }
                 },
                 text = {
                     Column {
                         Text(
-                            text = "Aap aapatkaal sahayata chun rahe hain. Kripya apna vikalp chunein:",
+                            text = stringResource(R.string.home_sos_message),
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -530,7 +589,7 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxWidth().height(48.dp),
                             shape = RoundedCornerShape(10.dp)
                         ) {
-                            Text("🚨 112 Direct Call Lagayein", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.sos_calling_112), fontWeight = FontWeight.Bold)
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                         Button(
@@ -544,7 +603,7 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxWidth().height(48.dp),
                             shape = RoundedCornerShape(10.dp)
                         ) {
-                            Text("📢 Contacts Ko Alert Bhejein", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.contacts_sos_contact), fontWeight = FontWeight.Bold)
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                         OutlinedButton(
@@ -557,14 +616,14 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxWidth().height(48.dp),
                             shape = RoundedCornerShape(10.dp)
                         ) {
-                            Text("🧪 Safe Demo / Test Mode", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.prescriptions_sample_demo), fontWeight = FontWeight.Bold)
                         }
                     }
                 },
                 confirmButton = {},
                 dismissButton = {
                     TextButton(onClick = { showSosDialog = false }) {
-                        Text("Radd Karein (Cancel)", color = TextHighContrast)
+                        Text(stringResource(R.string.common_cancel), color = TextHighContrast)
                     }
                 }
             )
@@ -575,12 +634,12 @@ fun HomeScreen(
             AlertDialog(
                 onDismissRequest = { sosAlertDetails = null },
                 title = {
-                    Text(
-                        text = "SOS Alert Summary",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = ForestGreen
-                    )
+                        Text(
+                            text = stringResource(R.string.home_sos_alert) + " " + stringResource(R.string.common_summary),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = ForestGreen
+                        )
                 },
                 text = {
                     Text(
@@ -593,7 +652,7 @@ fun HomeScreen(
                         onClick = { sosAlertDetails = null },
                         colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
                     ) {
-                        Text("Theek Hai (OK)")
+                        Text(stringResource(R.string.common_ok), fontWeight = FontWeight.Bold)
                     }
                 }
             )

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Vyavahaar</string>
-    <string name="app_tagline">Aapke Vyavahar Mein Hi Humara Pyaar Hai</string>
-    <string name="welcome_title">Namaste</string>
+    <string name="app_tagline">Your Companion for Everyday Life</string>
+    <string name="welcome_title">Welcome</string>
     <string name="welcome_subtitle">India\'s voice-first companion app for senior citizens.</string>
     <string name="get_started">Get Started</string>
     <string name="phone_label">Mobile Number</string>
@@ -17,4 +17,155 @@
     <string name="cab_ambulance">Travel &amp; Medical</string>
     <string name="doctors_appointments">Doctor Visits</string>
     <string name="prescriptions_medicines">Prescription &amp; Medicine</string>
+
+    <!-- Home Screen -->
+    <string name="home_greeting">Hello,</string>
+    <string name="home_how_can_help">How can I help you today?</string>
+    <string name="home_quick_actions">Quick Actions</string>
+    <string name="home_emergency_help">Emergency Help</string>
+    <string name="home_book_cab">Book a Cab</string>
+    <string name="home_find_events">Find Events</string>
+    <string name="home_doctor_appointment">Doctor Appointment</string>
+    <string name="home_scan_prescription">Scan Prescription</string>
+    <string name="home_call_contact">Call a Contact</string>
+    <string name="home_voice_assistant">Voice Assistant</string>
+    <string name="home_tap_mic_speak">Tap the mic and speak</string>
+    <string name="home_listening">Listening…</string>
+    <string name="home_sos_alert">SOS Alert</string>
+    <string name="home_sos_message">Emergency services will be notified. Continue?</string>
+    <string name="home_cancel">Cancel</string>
+    <string name="home_confirm">Confirm</string>
+    <string name="home_ok">OK</string>
+
+    <!-- Events Screen -->
+    <string name="events_title">Events &amp; Gatherings</string>
+    <string name="events_category_all">All</string>
+    <string name="events_category_social">Social</string>
+    <string name="events_category_health">Health</string>
+    <string name="events_category_learning">Learning</string>
+    <string name="events_category_spiritual">Spiritual</string>
+    <string name="events_empty">No events found nearby</string>
+    <string name="events_verified">Verified</string>
+    <string name="events_registered">Registered</string>
+    <string name="events_register">Register</string>
+    <string name="events_registered_text">You are registered</string>
+
+    <!-- Transport Screen -->
+    <string name="transport_title">Travel &amp; Emergency Help</string>
+    <string name="transport_mode_cab">Cab</string>
+    <string name="transport_mode_auto">Auto</string>
+    <string name="transport_mode_ambulance">Ambulance</string>
+    <string name="transport_book_ride">Book Ride</string>
+    <string name="transport_calling_ambulance">Calling Ambulance…</string>
+    <string name="transport_ride_booked">Ride booked successfully</string>
+    <string name="transport_booking_failed">Booking failed. Try again.</string>
+    <string name="transport_select_pickup">Select pickup location</string>
+    <string name="transport_select_drop">Select drop location</string>
+    <string name="transport_confirm_booking">Confirm Booking</string>
+
+    <!-- Appointments Screen -->
+    <string name="appointments_title">Doctor Appointments &amp; Reminders</string>
+    <string name="appointments_add_new">Add New Appointment</string>
+    <string name="appointments_empty">No appointments scheduled</string>
+    <string name="appointments_time_label">Time</string>
+    <string name="appointments_doctor_name">Doctor Name</string>
+    <string name="appointments_specialty">Specialty</string>
+    <string name="appointments_clinic">Clinic/Hospital</string>
+    <string name="appointments_date">Date</string>
+    <string name="appointments_time">Time</string>
+    <string name="appointments_notes">Notes</string>
+    <string name="appointments_save">Save</string>
+    <string name="appointments_edit">Edit</string>
+    <string name="appointments_delete">Delete</string>
+    <string name="appointments_reminder">Reminder</string>
+    <string name="appointments_reminder_15min">15 minutes before</string>
+    <string name="appointments_reminder_1hour">1 hour before</string>
+    <string name="appointments_reminder_1day">1 day before</string>
+
+    <!-- Prescriptions Screen -->
+    <string name="prescriptions_title">Prescriptions &amp; Medicines</string>
+    <string name="prescriptions_scan_ocr">Scan Doctor\'s Prescription (OCR)</string>
+    <string name="prescriptions_take_photo">Take a clear photo of the prescription to see medicine names</string>
+    <string name="prescriptions_camera_scan">Camera Scan</string>
+    <string name="prescriptions_sample_demo">Sample Demo</string>
+    <string name="prescriptions_search_hint">Search medicine name (e.g. Metformin, Paracetamol)</string>
+    <string name="prescriptions_ocr_results">OCR Results (Doctor Prescription)</string>
+    <string name="prescriptions_confidence">Confidence</string>
+    <string name="prescriptions_detected_medicines">Detected Medicines</string>
+    <string name="prescriptions_find_cheaper">Find Cheaper Alternatives</string>
+    <string name="prescriptions_verified_salt">Verified Salt</string>
+    <string name="prescriptions_salt_label">Salt</string>
+    <string name="prescriptions_manufacturer">Manufacturer</string>
+    <string name="prescriptions_dosage_form">Form</string>
+    <string name="prescriptions_clinical_note">Info</string>
+    <string name="prescriptions_alternatives">Affordable Alternatives</string>
+    <string name="prescriptions_no_alternatives">No alternatives found</string>
+    <string name="prescriptions_price">Price</string>
+
+    <!-- Contacts Screen -->
+    <string name="contacts_title">Trusted Contacts</string>
+    <string name="contacts_add_new">Add Contact</string>
+    <string name="contacts_empty">No trusted contacts added</string>
+    <string name="contacts_name">Name</string>
+    <string name="contacts_phone">Phone</string>
+    <string name="contacts_relation">Relation</string>
+    <string name="contacts_call">Call</string>
+    <string name="contacts_video_call">Video Call</string>
+    <string name="contacts_sos_contact">SOS Contact</string>
+    <string name="contacts_chat_history">Chat History</string>
+    <string name="contacts_calling">Calling…</string>
+    <string name="contacts_video_calling">Video calling…</string>
+    <string name="contacts_end_call">End Call</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings &amp; Accessibility</string>
+    <string name="settings_accessibility">Accessibility &amp; Convenience</string>
+    <string name="settings_language">Select Language</string>
+    <string name="settings_text_size">Text Size</string>
+    <string name="settings_text_size_preview">Preview: How does this size feel?</string>
+    <string name="settings_theme">Theme (Light / Dark Mode)</string>
+    <string name="settings_theme_light">Light (Day)</string>
+    <string name="settings_theme_dark">Dark (Night)</string>
+    <string name="settings_theme_system">System Default</string>
+    <string name="settings_voice_speed">Voice Speed</string>
+    <string name="settings_logout">Logout (Sign Out)</string>
+    <string name="settings_logout_confirm">Are you sure you want to logout?</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Vyavahaar</string>
+    <string name="login_subtitle">Secure and simple access with your mobile number.</string>
+    <string name="login_sending">Sending…</string>
+
+    <!-- OTP Screen -->
+    <string name="otp_title">Enter OTP</string>
+    <string name="otp_subtitle">We\'ve sent a 6-digit code to %s.</string>
+    <string name="otp_label">6-Digit Code</string>
+    <string name="otp_verifying">Verifying…</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_title">Welcome to Vyavahaar Family</string>
+    <string name="onboarding_subtitle">Just fill in a little info so we can help you better.</string>
+    <string name="onboarding_name_label">Your Name</string>
+    <string name="onboarding_language_label">Preferred Language</string>
+    <string name="onboarding_text_size_label">Text Size</string>
+    <string name="onboarding_text_size_preview">Preview: This size is easy to read.</string>
+    <string name="onboarding_continue">Continue (Complete)</string>
+    <string name="onboarding_saving">Saving…</string>
+
+    <!-- Common -->
+    <string name="common_yes">Yes</string>
+    <string name="common_no">No</string>
+    <string name="common_ok">OK</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_save">Save</string>
+    <string name="common_edit">Edit</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_retry">Retry</string>
+    <string name="common_loading">Loading…</string>
+    <string name="common_error">Something went wrong</string>
+    <string name="common_permission_needed">Permission needed</string>
+    <string name="common_grant_permission">Please grant permission in settings</string>
+    <string name="settings_open">Open Settings</string>
+    <string name="common_summary">Summary</string>
+    <string name="home_open">Open</string>
 </resources>

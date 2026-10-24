@@ -8,7 +8,8 @@ import java.util.concurrent.TimeUnit
 
 object ApiClient {
     // 10.0.2.2 points to host machine from Android Emulator; 127.0.0.1 for local testing
-    var baseUrl: String = "http://10.0.2.2:8000/"
+    // Override for physical device: -Dvyavahaar.baseUrl=http://<your-computer-ip>:8000/
+    var baseUrl: String = System.getProperty("vyavahaar.baseUrl", "http://10.164.19.32:8000/")
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

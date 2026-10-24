@@ -1,9 +1,12 @@
 package org.vyavahaar.app.ui.screens.appointments
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -49,15 +52,15 @@ fun AppointmentsScreen(
         refresh()
     }
 
-    Scaffold(
-        topBar = { VyavahaarTopBar(title = "Doctor Appointments & Reminders", onBackClick = onBack) },
+        Scaffold(
+        topBar = { VyavahaarTopBar(title = "डॉक्टर अपॉइंटमेंट और रिमाइंडर", onBackClick = onBack) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showDialog = true },
                 containerColor = TerracottaPrimary,
                 contentColor = WarmCardSurface
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Schedule Appointment")
+                Icon(Icons.Default.Add, contentDescription = "अपॉइंटमेंट शेड्यूल करें")
             }
         },
         containerColor = WarmCreamBackground
@@ -65,11 +68,12 @@ fun AppointmentsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
             Text(
-                text = "Aapki Doctor Visits",
+                text = "आपके डॉक्टर विजिट",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = TextHighContrast
@@ -79,7 +83,7 @@ fun AppointmentsScreen(
             if (appointments.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = "Abhi koi appointment darj nahi hai.\nNeeche '+' button dabakar jodein.",
+                        text = "अभी कोई अपॉइंटमेंट दर्ज नहीं है।\nनीचे '+' बटन दबाकर जोड़ें।",
                         style = MaterialTheme.typography.bodyLarge,
                         color = TextMediumContrast
                     )
@@ -109,7 +113,7 @@ fun AppointmentsScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = TerracottaPrimary, modifier = Modifier.size(20.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Samay: ${appt.appointmentTime}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                                    Text("समय: ${appt.appointmentTime}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
                                 }
                             }
                         }
@@ -118,18 +122,18 @@ fun AppointmentsScreen(
             }
         }
 
-        if (showDialog) {
+            if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },
-                title = { Text("Nayi Doctor Visit Book Karein", fontWeight = FontWeight.Bold) },
+                title = { Text("नई डॉक्टर विजिट बुक करें", fontWeight = FontWeight.Bold) },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        OutlinedTextField(value = doctorName, onValueChange = { doctorName = it }, label = { Text("Doctor Name") })
-                        OutlinedTextField(value = specialty, onValueChange = { specialty = it }, label = { Text("Specialty") })
-                        OutlinedTextField(value = clinic, onValueChange = { clinic = it }, label = { Text("Hospital / Clinic") })
+                        OutlinedTextField(value = doctorName, onValueChange = { doctorName = it }, label = { Text("डॉक्टर का नाम") })
+                        OutlinedTextField(value = specialty, onValueChange = { specialty = it }, label = { Text("विशेषज्ञता") })
+                        OutlinedTextField(value = clinic, onValueChange = { clinic = it }, label = { Text("हॉस्पिटल / क्लिनिक") })
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            FilterChip(selected = recurrence == "NONE", onClick = { recurrence = "NONE" }, label = { Text("One-Time") })
-                            FilterChip(selected = recurrence == "MONTHLY", onClick = { recurrence = "MONTHLY" }, label = { Text("Monthly") })
+                            FilterChip(selected = recurrence == "NONE", onClick = { recurrence = "NONE" }, label = { Text("एक बार") })
+                            FilterChip(selected = recurrence == "MONTHLY", onClick = { recurrence = "MONTHLY" }, label = { Text("मासिक") })
                         }
                     }
                 },
@@ -144,11 +148,11 @@ fun AppointmentsScreen(
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
                     ) {
-                        Text("Schedule Karein")
+                        Text("शेड्यूल करें")
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDialog = false }) { Text("Cancel") }
+                    TextButton(onClick = { showDialog = false }) { Text("रद्द करें") }
                 }
             )
         }

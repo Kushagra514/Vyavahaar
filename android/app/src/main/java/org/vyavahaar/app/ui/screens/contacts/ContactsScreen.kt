@@ -3,11 +3,14 @@ package org.vyavahaar.app.ui.screens.contacts
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Star
@@ -48,17 +51,18 @@ fun ContactsScreen(
     }
 
     Scaffold(
-        topBar = { VyavahaarTopBar(title = "Apne Log (Contacts)", onBackClick = onBack) },
+        topBar = { VyavahaarTopBar(title = "अपने लोग (संपर्क)", onBackClick = onBack) },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
             Text(
-                text = "Vishwaspaatra Sampark (Trusted Contacts)",
+                text = "विश्वसनीय संपर्क (विश्वसनीय संपर्क)",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = TextHighContrast
@@ -148,13 +152,13 @@ fun ContactsScreen(
         if (activeCallingName != null) {
             AlertDialog(
                 onDismissRequest = { activeCallingName = null },
-                title = { Text("Video Call Lagayi Ja Rahi Hai", fontWeight = FontWeight.Bold) },
+                title = { Text("वीडियो कॉल लगाई जा रही है", fontWeight = FontWeight.Bold) },
                 text = {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Default.Videocam, contentDescription = null, tint = CalmBlue, modifier = Modifier.size(64.dp))
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "$activeCallingName se video call connect ho rahi hai...",
+                            text = "$activeCallingName से वीडियो कॉल कनेक्ट हो रही है...",
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium
                         )
@@ -165,7 +169,7 @@ fun ContactsScreen(
                         onClick = { activeCallingName = null },
                         colors = ButtonDefaults.buttonColors(containerColor = SosCrimson)
                     ) {
-                        Text("Call Kaatein (End)")
+                        Text("कॉल काटें (समाप्त)")
                     }
                 }
             )

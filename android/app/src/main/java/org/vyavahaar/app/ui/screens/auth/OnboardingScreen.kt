@@ -34,7 +34,7 @@ fun OnboardingScreen(
     var isLoading by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = { VyavahaarTopBar(title = "Aapka Parichay (Profile)") },
+        topBar = { VyavahaarTopBar(title = "आपका परिचय (प्रोफाइल)") },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
@@ -46,14 +46,14 @@ fun OnboardingScreen(
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = "Vyavahaar Parivaar Mein Swagat Hai",
+                text = "व्यवहार परिवार में स्वागत है",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = TextHighContrast
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "Bas kuch aasan jaankari bharein taaki hum aapki behtar madad kar sakein.",
+                text = "बस कुछ आसान जानकारी भरें ताकि हम आपकी बेहतर मदद कर सकें।",
                 style = MaterialTheme.typography.bodyLarge,
                 color = TextMediumContrast
             )
@@ -61,7 +61,7 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Name field
-            Text("Aapka Shubh Naam", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text("आपका शुभ नाम", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = fullName,
@@ -74,7 +74,7 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Preferred Language
-            Text("Aapki Pasandida Bhasha (Language)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text("आपकी पसंदीदा भाषा (Language)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(
@@ -97,7 +97,7 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Text size accessibility preview
-            Text("Akshar Ka Aakar (Text Size)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text("अक्षर का आकार (टेक्स्ट साइज़)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(8.dp))
             Slider(
                 value = fontScale,
@@ -106,7 +106,7 @@ fun OnboardingScreen(
                 steps = 2
             )
             Text(
-                text = "Namuna: Yeh aakar padhne mein aasan hai.",
+                text = "नमूना: यह आकार पढ़ने में आसान है।",
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = (18 * fontScale).sp),
                 color = TerracottaPrimary,
                 fontWeight = FontWeight.Medium
@@ -115,7 +115,7 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(36.dp))
 
             VyavahaarButton(
-                text = if (isLoading) "Surakshit kar rahe hain..." else "Aage Badhein (Complete)",
+                text = if (isLoading) "सुरक्षित कर रहे हैं..." else "आगे बढ़ें (पूर्ण)",
                 enabled = fullName.isNotBlank() && !isLoading,
                 onClick = {
                     isLoading = true

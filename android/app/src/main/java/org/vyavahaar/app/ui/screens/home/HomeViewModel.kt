@@ -137,13 +137,23 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             result.onSuccess { response ->
                 handleAssistantResponse(response)
             }.onFailure { error ->
-                val fallbackMsg = "Kshama karein, network error aayi. Kripya punah prayas karein."
-                _uiState.value = _uiState.value.copy(
-                    voiceState = VoiceAssistantState.ERROR,
-                    assistantFeedback = fallbackMsg,
-                    statusMessage = "Sampark nahi ho saka"
-                )
-                speak(fallbackMsg)
+                val msg = error.message ?: ""
+                if (msg.startsWith("NOT_AUTHENTICATED")) {
+                    _uiState.value = _uiState.value.copy(
+                        voiceState = VoiceAssistantState.ERROR,
+                        assistantFeedback = "Please log in first to use voice commands. Open Login screen and use OTP 123456.",
+                        statusMessage = "Login required"
+                    )
+                    speak("Please log in first to use voice commands.")
+                } else {
+                    val fallbackMsg = "Kshama karein, network error aayi. Kripya punah prayas karein."
+                    _uiState.value = _uiState.value.copy(
+                        voiceState = VoiceAssistantState.ERROR,
+                        assistantFeedback = fallbackMsg,
+                        statusMessage = "Sampark nahi ho saka"
+                    )
+                    speak(fallbackMsg)
+                }
             }
         }
     }
@@ -230,6 +240,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             recognizedTranscript = "",
             assistantFeedback = "",
             statusMessage = "Sabhi sevaayein taiyaar hain"
+        )
+    }
+
+    fun dismissToolCall() {
+        _uiState.value = _uiState.value.copy(
+            activeToolCall = null,
+            showConfirmationDialog = false
         )
     }
 

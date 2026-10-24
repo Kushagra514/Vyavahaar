@@ -13,27 +13,62 @@ import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
     primary = TerracottaPrimary,
-    onPrimary = WarmCardSurface,
-    primaryContainer = WarmCreamBackground,
+    onPrimary = LightOnPrimary,
+    primaryContainer = TerracottaContainer,
+    onPrimaryContainer = TerracottaPrimary,
     secondary = TealAccent,
-    background = WarmCreamBackground,
-    surface = WarmCardSurface,
-    onBackground = TextHighContrast,
-    onSurface = TextHighContrast,
+    onSecondary = LightOnSecondary,
+    secondaryContainer = LightSecondaryContainer,
+    onSecondaryContainer = LightOnSecondaryContainer,
+    tertiary = MicOrangeYellow,
+    onTertiary = LightOnTertiary,
+    tertiaryContainer = LightTertiaryContainer,
+    onTertiaryContainer = LightOnTertiaryContainer,
     error = SosCrimson,
-    onError = OnSosCrimson
+    onError = LightOnError,
+    errorContainer = LightErrorContainer,
+    onErrorContainer = LightOnErrorContainer,
+    background = LightBackground,
+    onBackground = LightOnBackground,
+    surface = LightSurface,
+    onSurface = LightOnSurface,
+    surfaceVariant = LightSurfaceVariant,
+    onSurfaceVariant = LightOnSurfaceVariant,
+    outline = LightOutline,
+    outlineVariant = LightOutlineVariant,
+    inverseSurface = LightInverseSurface,
+    inverseOnSurface = LightInverseOnSurface,
+    inversePrimary = TerracottaPrimary
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = MicOrangeYellow,
-    onPrimary = DarkBackground,
-    secondary = TealAccent,
+    primary = DarkPrimary,
+    onPrimary = DarkOnPrimary,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = DarkOnPrimaryContainer,
+    secondary = DarkSecondary,
+    onSecondary = DarkOnSecondary,
+    secondaryContainer = DarkSecondaryContainer,
+    onSecondaryContainer = DarkOnSecondaryContainer,
+    tertiary = DarkTertiary,
+    onTertiary = DarkOnTertiary,
+    tertiaryContainer = DarkTertiaryContainer,
+    onTertiaryContainer = DarkOnTertiaryContainer,
+    error = DarkError,
+    onError = DarkOnError,
+    errorContainer = DarkErrorContainer,
+    onErrorContainer = DarkOnErrorContainer,
     background = DarkBackground,
+    onBackground = DarkOnBackground,
     surface = DarkSurface,
-    onBackground = DarkTextPrimary,
-    onSurface = DarkTextPrimary,
-    error = SosCrimson,
-    onError = OnSosCrimson
+    onSurface = DarkOnSurface,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = DarkOnSurfaceVariant,
+    outline = DarkOutline,
+    outlineVariant = DarkOutlineVariant,
+    inverseSurface = DarkInverseSurface,
+    inverseOnSurface = DarkInverseOnSurface,
+    inversePrimary = TerracottaPrimary
 )
 
 @Composable
@@ -45,6 +80,8 @@ fun VyavahaarTheme(
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
     val view = LocalView.current
     if (!view.isInEditMode) {
+        // statusBarColor/navigationBarColor lack a non-deprecated color setter in this SDK; legacy calls kept intentionally.
+        @Suppress("DEPRECATION")
         SideEffect {
             val window = (view.context as? Activity)?.window
             window?.let {

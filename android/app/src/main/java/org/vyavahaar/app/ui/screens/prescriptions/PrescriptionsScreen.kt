@@ -7,10 +7,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import java.io.ByteArrayOutputStream
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckCircle
@@ -95,12 +98,13 @@ fun PrescriptionsScreen(
     }
 
     Scaffold(
-        topBar = { VyavahaarTopBar(title = "Dawai & Parchi Jankaari", onBackClick = onBack) },
+        topBar = { VyavahaarTopBar(title = "दवाई और पर्ची जानकारी", onBackClick = onBack) },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
@@ -114,9 +118,9 @@ fun PrescriptionsScreen(
                 Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Default.CameraAlt, contentDescription = null, tint = TerracottaPrimary, modifier = Modifier.size(36.dp))
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Doctor Ki Parchi Scan Karein (OCR)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text("डॉक्टर की पर्ची स्कैन करें (OCR)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("Parchi ki saaf photo lein aur dawaiyon ke naam dekhein.", style = MaterialTheme.typography.bodyMedium, color = TextMediumContrast)
+                    Text("पर्ची की साफ़ फोटो लें और दवाइयों के नाम देखें।", style = MaterialTheme.typography.bodyMedium, color = TextMediumContrast)
                     Spacer(modifier = Modifier.height(12.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
@@ -124,7 +128,7 @@ fun PrescriptionsScreen(
                                 try {
                                     cameraLauncher.launch(null)
                                 } catch (e: Exception) {
-                                    Toast.makeText(context, "Camera uplabdh nahi hai. Sample demo run kar rahe hain.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "कैमरा उपलब्ध नहीं है। सैंपल डेमो चला रहे हैं।", Toast.LENGTH_SHORT).show()
                                     runSampleOcrDemo()
                                 }
                             },
@@ -133,7 +137,7 @@ fun PrescriptionsScreen(
                             modifier = Modifier.weight(1f).height(48.dp),
                             enabled = !isLoading
                         ) {
-                            Text(if (isLoading) "Scan..." else "Camera Scan", fontWeight = FontWeight.Bold)
+                            Text(if (isLoading) "स्कैन हो रहा..." else "कैमरा से स्कैन", fontWeight = FontWeight.Bold)
                         }
                         OutlinedButton(
                             onClick = { runSampleOcrDemo() },
@@ -141,7 +145,7 @@ fun PrescriptionsScreen(
                             modifier = Modifier.weight(1f).height(48.dp),
                             enabled = !isLoading
                         ) {
-                            Text("🧪 Sample Demo", fontWeight = FontWeight.Bold)
+                            Text("🧪 सैंपल डेमो", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -153,7 +157,7 @@ fun PrescriptionsScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("Dawai Ka Naam Khojein (e.g. Metformin, Paracetamol)") },
+                label = { Text("दवाई का नाम खोजें (जैसे: मेटफॉर्मिन, पैरासिटामोल)") },
                 trailingIcon = {
                     IconButton(onClick = {
                         coroutineScope.launch {
@@ -188,15 +192,15 @@ fun PrescriptionsScreen(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = "OCR Natije (Doctor Parchi)",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = TerracottaPrimary
-                                    )
+                                Text(
+                                    text = "OCR नतीजे (डॉक्टर की पर्ची)",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TerracottaPrimary
+                                )
                                     AssistChip(
                                         onClick = {},
-                                        label = { Text("${(scanResult!!.confidenceScore * 100).toInt()}% Vishwas") }
+                                        label = { Text("${(scanResult!!.confidenceScore * 100).toInt()}% विश्वास") }
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -237,7 +241,7 @@ fun PrescriptionsScreen(
                                                     }
                                                 }
                                             ) {
-                                                Text("Saste Vikalp Khojein", color = ForestGreen, fontWeight = FontWeight.Bold)
+                                                Text("सस्ते विकल्प खोजें", color = ForestGreen, fontWeight = FontWeight.Bold)
                                             }
                                         }
                                     }
@@ -268,7 +272,7 @@ fun PrescriptionsScreen(
                         ) {
                             Column(modifier = Modifier.padding(12.dp)) {
                                 Text(
-                                    text = "Satyapit Salt: ${searchResult!!.matchedSalt}",
+                                    text = "सत्यापित साल्ट: ${searchResult!!.matchedSalt}",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = ForestGreen
@@ -294,9 +298,9 @@ fun PrescriptionsScreen(
                                     Text("₹${alt.approximatePriceInr}", style = MaterialTheme.typography.titleMedium, color = ForestGreen, fontWeight = FontWeight.Bold)
                                 }
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text("Salt: ${alt.activeIngredient} (${alt.strength})", style = MaterialTheme.typography.bodyMedium)
-                                Text("Nirmata: ${alt.manufacturer} • ${alt.dosageForm}", style = MaterialTheme.typography.bodySmall, color = TextMediumContrast)
-                                Text("Jankaari: ${alt.clinicalNote}", style = MaterialTheme.typography.bodySmall, color = TextHighContrast)
+                                Text("साल्ट: ${alt.activeIngredient} (${alt.strength})", style = MaterialTheme.typography.bodyMedium)
+                                Text("निर्माता: ${alt.manufacturer} \u2022 ${alt.dosageForm}", style = MaterialTheme.typography.bodySmall, color = TextMediumContrast)
+                                Text("जानकारी: ${alt.clinicalNote}", style = MaterialTheme.typography.bodySmall, color = TextHighContrast)
                             }
                         }
                     }

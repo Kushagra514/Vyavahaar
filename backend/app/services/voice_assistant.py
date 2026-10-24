@@ -25,12 +25,16 @@ class VoiceAssistantService:
 
     def process_command(self, transcript: str, detected_language: str = "hi") -> VoiceCommandResponse:
         raw_text = transcript.strip().lower()
-        # Clean punctuation for token checks
-        text = re.sub(r'[^\w\s]', ' ', raw_text)
+        # Clean punctuation for token checks (keep Devanagari letters AND combining marks/matras)
+        text = re.sub(r'[^\w\s\u0900-\u097F]', ' ', raw_text)
         tokens = text.split()
 
         # 1. Emergency / SOS / 112 (Highest priority, immediate dispatch)
-        if any(w in text for w in ["sos", "emergency", "bachao", "madad", "help", "112", "khatra", "sahayata", "danger", "police"]):
+        # Keywords support both Latin (Hinglish) and Devanagari (hi-IN recognizer) scripts
+        if any(w in text for w in [
+            "sos", "emergency", "bachao", "madad", "help", "112", "khatra", "sahayata", "danger", "police",
+            "बचाओ", "मदद", "खतरा", "ख़तरा", "संकट", "आपात", "सहायता", "पुलिस", "डर", "बैचाओ"
+        ]):
             return VoiceCommandResponse(
                 recognized_text=transcript,
                 spoken_feedback="Aapka SOS alert khola ja raha hai. Direct 112 call aur parivar ko sandesh taiyaar hai.",
@@ -44,7 +48,7 @@ class VoiceAssistantService:
             )
 
         # 2. Unsupported Language Detection (e.g. Kannada requested)
-        if any(w in text for w in ["kannada", "bengali", "marathi", "tamil", "telugu", "gujarati"]):
+        if any(w in text for w in ["kannada", "bengali", "marathi", "tamil", "telugu", "gujarati", "कन्नड़", "बंगाली", "मराठी", "तमिल", "तेलुगु", "गुजराती"]):
             return VoiceCommandResponse(
                 recognized_text=transcript,
                 spoken_feedback="Kshama karein, awaz sahayata keval Hindi aur English mein uplabdh hai.",
@@ -59,11 +63,11 @@ class VoiceAssistantService:
             )
 
         # 3. Negation & Cancellation Handling (Evaluated BEFORE positive action keywords)
-        negation_terms = ["mat karo", "mat karna", "rok do", "band karo", "cancel", "don't", "dont", "abort", "wapas", "ruk jao", "rehne do"]
+        negation_terms = ["mat karo", "mat karna", "rok do", "band karo", "cancel", "don't", "dont", "abort", "wapas", "ruk jao", "rehne do", "मत करो", "मत करना", "रोक दो", "बंद करो", "रद्द", "वापस", "रुक जाओ", "रोको", "छोड़ दो"]
         is_negated = any(w in text for w in negation_terms)
 
         if is_negated:
-            if any(w in text for w in ["cab", "taxi", "gaadi", "ride", "auto"]):
+            if any(w in text for w in ["cab", "taxi", "gaadi", "ride", "auto", "टैक्सी", "कैब", "गाड़ी", "ऑटो", "रिक्शा", "सवारी"]):
                 return VoiceCommandResponse(
                     recognized_text=transcript,
                     spoken_feedback="Theek hai, cab booking radd kar di gayi hai.",
@@ -75,7 +79,7 @@ class VoiceAssistantService:
                         requires_confirmation=False
                     )
                 )
-            elif any(w in text for w in ["event", "satsang", "karyakram", "gathering"]):
+            elif any(w in text for w in ["event", "satsang", "karyakram", "gathering", "सत्संग", "कीर्तन", "आयोजन", "कार्यक्रम", "समारोह", "सभा"]):
                 return VoiceCommandResponse(
                     recognized_text=transcript,
                     spoken_feedback="Theek hai, karyakram band kar diya gaya hai.",
@@ -101,7 +105,7 @@ class VoiceAssistantService:
                 )
 
         # 4. Pure Rejection / Denial Responses (e.g. "nahi", "no")
-        if any(w in tokens for w in ["nahi", "na", "no"]) and len(tokens) <= 3:
+        if any(w in tokens for w in ["nahi", "na", "no", "नहीं", "ना", "नही"]) and len(tokens) <= 3:
             return VoiceCommandResponse(
                 recognized_text=transcript,
                 spoken_feedback="Theek hai, anurodh radd kar diya gaya hai.",
@@ -116,9 +120,9 @@ class VoiceAssistantService:
 
         # 5. Confirmation Responses (e.g. "haan", "yes", "confirm", "theek hai")
         is_confirmation = (
-            any(w in tokens for w in ["haan", "ha", "yes", "confirm"]) or
-            text in ["theek hai", "sahi hai", "kar do", "aage badho", "ok", "sure", "proceed"]
-        ) and not any(w in text for w in ["cab", "ride", "taxi", "doctor", "satsang", "call", "prescription", "text", "size", "font", "akshar", "bhasha"])
+            any(w in tokens for w in ["haan", "ha", "yes", "confirm", "हाँ", "हां", "पुष्टि"]) or
+            text in ["theek hai", "sahi hai", "kar do", "aage badho", "ok", "sure", "proceed", "ठीक है", "सही है", "शुरू करो", "बढ़ाओ"]
+        ) and not any(w in text for w in ["cab", "ride", "taxi", "doctor", "satsang", "call", "prescription", "text", "size", "font", "akshar", "bhasha", "सत्संग", "कैब", "टैक्सी", "गाड़ी", "रिक्शा", "ऑटो", "कॉल", "फोन", "डॉक्टर", "पर्चा", "दवा", "बड़ा", "छोटा", "भाषा", "हिंदी", "अंग्रेज़", "अंग्रेज", "अक्षर"])
 
         if is_confirmation:
             return VoiceCommandResponse(
@@ -134,8 +138,8 @@ class VoiceAssistantService:
             )
 
         # 6. Prescription / Medicine Reading & Lookup (Evaluated before general doctor appointment)
-        if any(w in text for w in ["prescription", "parchi", "dawai", "medicine", "tablet", "dawakhana", "pill", "syrup"]):
-            if any(w in text for w in ["parchi", "prescription", "scan", "photo", "padh", "camera"]):
+        if any(w in text for w in ["prescription", "parchi", "dawai", "medicine", "tablet", "dawakhana", "pill", "syrup", "पर्चा", "पर्ची", "दवा", "दवाई", "गोली", "टैबलेट", "सिरप", "भेषज", "मेडिसिन"]):
+            if any(w in text for w in ["parchi", "prescription", "scan", "photo", "padh", "camera", "स्कैन", "तस्वीर", "पढ़ो", "पढ़ कर", "कैमरा", "पर्चा", "पर्ची"]):
                 return VoiceCommandResponse(
                     recognized_text=transcript,
                     spoken_feedback="Prescription scan karne ke liye camera khol rahe hain.",
@@ -161,7 +165,7 @@ class VoiceAssistantService:
                 )
 
         # 7. Ambulance (Immediate medical transport)
-        if any(w in text for w in ["ambulance", "aspataal le jao", "hospital le jao"]):
+        if any(w in text for w in ["ambulance", "aspataal le jao", "hospital le jao", "एम्बुलेंस", "एम्बुलेन्स", "अस्पताल ले जाओ", "अस्पताल ले चलो", "अस्पताल ले"]):
             return VoiceCommandResponse(
                 recognized_text=transcript,
                 spoken_feedback="Ambulance sahayata screen kholi ja rahi hai. 112 emergency dialing uplabdh hai.",
@@ -175,13 +179,13 @@ class VoiceAssistantService:
             )
 
         # 8. Cab / Taxi Booking (Requires two-step confirmation for elderly safety)
-        if any(w in text for w in ["cab", "taxi", "gaadi", "auto", "ride", "rickshaw"]):
+        if any(w in text for w in ["cab", "taxi", "gaadi", "auto", "ride", "rickshaw", "टैक्सी", "कैब", "गाड़ी", "ऑटो", "रिक्शा", "सवारी"]):
             dest = "Aas paas"
-            if "mandir" in text or "temple" in text:
+            if "mandir" in text or "temple" in text or "मंदिर" in text:
                 dest = "Mandir"
-            elif "hospital" in text or "doctor" in text or "clinic" in text:
+            elif "hospital" in text or "doctor" in text or "clinic" in text or "अस्पताल" in text or "डॉक्टर" in text or "क्लिनिक" in text:
                 dest = "Doctor Clinic"
-            elif "market" in text or "bazaar" in text or "dukaan" in text:
+            elif "market" in text or "bazaar" in text or "dukaan" in text or "बाज़ार" in text or "बाजार" in text or "दुकान" in text or "मंडी" in text:
                 dest = "Bazaar"
                 
             return VoiceCommandResponse(
@@ -198,18 +202,18 @@ class VoiceAssistantService:
             )
 
         # 9. Calling / Video Calling (Family / Contacts)
-        if any(w in text for w in ["call", "video call", "baat karni", "phone lagao", "bulao", "dial", "ring"]):
-            is_video = "video" in text
+        if any(w in text for w in ["call", "video call", "baat karni", "phone lagao", "bulao", "dial", "ring", "कॉल", "बात करनी", "फोन लगाओ", "बुलाओ", "डायल", "वीडियो कॉल", "मिलाओ"]):
+            is_video = "video" in text or "वीडियो" in text
             target = "contact"
-            if any(w in text for w in ["beta", "bete", "son"]):
+            if any(w in text for w in ["beta", "bete", "son", "बेटा", "बेटे"]):
                 target = "Beta"
-            elif any(w in text for w in ["beti", "daughter"]):
+            elif any(w in text for w in ["beti", "daughter", "बेटी"]):
                 target = "Beti"
-            elif any(w in text for w in ["pota", "poti", "grandchild"]):
+            elif any(w in text for w in ["pota", "poti", "grandchild", "पोता", "पोती"]):
                 target = "Pota"
-            elif any(w in text for w in ["friend", "dost", "mitra"]):
+            elif any(w in text for w in ["friend", "dost", "mitra", "दोस्त", "मित्र"]):
                 target = "Dost"
-            elif any(w in text for w in ["doctor", "dr"]):
+            elif any(w in text for w in ["doctor", "dr", "डॉक्टर", "डा."]):
                 target = "Doctor"
                 
             feedback = f"{target} ko {'video call' if is_video else 'voice call'} lagayi ja rahi hai."
@@ -226,15 +230,15 @@ class VoiceAssistantService:
             )
 
         # 10. Events / Satsang / Walk / Yoga
-        if any(w in text for w in ["satsang", "kirtan", "event", "gathering", "yoga", "walk", "tahalna", "program", "samaroh", "bajan", "community"]):
+        if any(w in text for w in ["satsang", "kirtan", "event", "gathering", "yoga", "walk", "tahalna", "program", "samaroh", "bajan", "community", "सत्संग", "कीर्तन", "आयोजन", "कार्यक्रम", "समारोह", "भजन", "सभा", "योग", "टहलना", "सैर", "घूमना", "समुदाय"]):
             category = "ALL"
-            if "satsang" in text or "kirtan" in text or "bajan" in text:
+            if "satsang" in text or "kirtan" in text or "bajan" in text or "सत्संग" in text or "कीर्तन" in text or "भजन" in text:
                 category = "Satsang"
-            elif "yoga" in text:
+            elif "yoga" in text or "योग" in text:
                 category = "Yoga"
-            elif "walk" in text or "tahalna" in text:
+            elif "walk" in text or "tahalna" in text or "टहलना" in text or "सैर" in text or "घूमना" in text:
                 category = "Walking"
-            elif "health" in text or "camp" in text:
+            elif "health" in text or "camp" in text or "स्वास्थ्य" in text or "शिविर" in text:
                 category = "HealthCamp"
 
             return VoiceCommandResponse(
@@ -250,7 +254,7 @@ class VoiceAssistantService:
             )
 
         # 11. Doctor Appointment
-        if any(w in text for w in ["doctor", "appointment", "clinic", "ilaaj", "checkup", "vaidya", "consultation"]):
+        if any(w in text for w in ["doctor", "appointment", "clinic", "ilaaj", "checkup", "vaidya", "consultation", "डॉक्टर", "अपॉइंटमेंट", "क्लिनिक", "इलाज", "चेकअप", "परामर्श", "चिकित्सक", "जांच"]):
             return VoiceCommandResponse(
                 recognized_text=transcript,
                 spoken_feedback="Doctor appointment booking screen khol di gayi hai.",
@@ -264,8 +268,8 @@ class VoiceAssistantService:
             )
 
         # 12. Accessibility Settings: Text Size
-        if any(w in text for w in ["text size", "akshar", "bada kar do", "chhota kar do", "font", "larger font", "smaller font"]):
-            is_larger = any(w in text for w in ["bada", "large", "increase", "mota", "bigger"])
+        if any(w in text for w in ["text size", "akshar", "bada kar do", "chhota kar do", "font", "larger font", "smaller font", "टेक्स्ट", "फॉन्ट", "अक्षर", "आकार", "बड़ा", "छोटा", "मोटा", "शब्द"]):
+            is_larger = any(w in text for w in ["bada", "large", "increase", "mota", "bigger", "बड़ा", "बड़े", "मोटा", "बढ़ाओ", "बढ़ा"])
             new_scale = 1.4 if is_larger else 1.0
             return VoiceCommandResponse(
                 recognized_text=transcript,
@@ -280,10 +284,10 @@ class VoiceAssistantService:
             )
 
         # 13. Accessibility Settings: Language Selection (Hindi and English only)
-        if any(w in text for w in ["hindi", "english", "bhasha", "language"]):
+        if any(w in text for w in ["hindi", "english", "bhasha", "language", "हिंदी", "अंग्रेज़ी", "अंग्रेजी", "भाषा"]):
             lang = "hi"
             lang_name = "Hindi"
-            if "english" in text:
+            if "english" in text or "अंग्रेज़" in text or "अंग्रेज" in text:
                 lang = "en"
                 lang_name = "English"
                 
@@ -300,8 +304,8 @@ class VoiceAssistantService:
             )
 
         # 14. Accessibility Settings: Theme (Dark / Light)
-        if any(w in text for w in ["dark mode", "light mode", "theme", "raat", "din"]):
-            mode = "dark" if any(w in text for w in ["dark", "raat"]) else "light"
+        if any(w in text for w in ["dark mode", "light mode", "theme", "raat", "din", "डार्क", "लाइट", "थीम", "रात", "दिन"]):
+            mode = "dark" if any(w in text for w in ["dark", "raat", "डार्क", "रात"]) else "light"
             return VoiceCommandResponse(
                 recognized_text=transcript,
                 spoken_feedback=f"{'Dark' if mode == 'dark' else 'Light'} mode chalu kar diya gaya hai.",

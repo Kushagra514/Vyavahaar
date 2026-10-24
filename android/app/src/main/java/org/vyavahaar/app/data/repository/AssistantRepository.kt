@@ -15,14 +15,23 @@ class AssistantRepository(
         return try {
             val token = preferences.authToken.firstOrNull() ?: ""
             val lang = preferences.preferredLanguage.firstOrNull() ?: "hi"
+            if (token.isBlank()) {
+                return Result.failure(
+                    Exception("NOT_AUTHENTICATED: Please log in to use voice commands. Phone: +91 9876543210, OTP: 123456")
+                )
+            }
             val response = api.processCommand(
                 "Bearer $token",
                 VoiceCommandRequestDto(transcript, lang)
             )
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
+            } else if (response.code() == 401) {
+                return Result.failure(
+                    Exception("NOT_AUTHENTICATED: Session expired. Please log in again. Phone: +91 9876543210, OTP: 123456")
+                )
             } else {
-                Result.failure(Exception(response.errorBody()?.string() ?: "Failed to process voice command"))
+                Result.failure(Exception(response.errorBody()?.string() ?: "Failed to process voice command (HTTP ${response.code()})"))
             }
         } catch (e: Exception) {
             Result.failure(e)

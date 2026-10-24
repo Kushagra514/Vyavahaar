@@ -1,11 +1,14 @@
 package org.vyavahaar.app.ui.screens.events
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.LocationOn
@@ -15,9 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.vyavahaar.app.R
 import org.vyavahaar.app.data.local.PreferencesDataStore
 import org.vyavahaar.app.data.remote.ApiClient
 import org.vyavahaar.app.data.remote.EventDto
@@ -40,6 +45,13 @@ fun EventsScreen(
     var actionStatusMessage by remember { mutableStateOf<String?>(null) }
 
     val categories = listOf("ALL", "Satsang", "Walking", "Yoga", "HealthCamp")
+    
+    // String resources for category labels
+    val categoryAll = stringResource(R.string.events_category_all)
+    val categorySatsang = stringResource(R.string.events_category_social) // Satsang is social
+    val categoryWalking = stringResource(R.string.events_category_health) // Walking is health
+    val categoryYoga = stringResource(R.string.events_category_learning) // Yoga is learning
+    val categoryHealthCamp = stringResource(R.string.events_category_health) // Health camp is health
 
     fun loadEvents() {
         coroutineScope.launch {
@@ -54,13 +66,14 @@ fun EventsScreen(
         loadEvents()
     }
 
-    Scaffold(
-        topBar = { VyavahaarTopBar(title = "Karyakram & Milan (Events)", onBackClick = onBack) },
+        Scaffold(
+        topBar = { VyavahaarTopBar(title = stringResource(R.string.events_title), onBackClick = onBack) },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
         ) {
@@ -75,11 +88,11 @@ fun EventsScreen(
                         label = {
                             Text(
                                 text = when (cat) {
-                                    "ALL" -> "Sabhi (All)"
-                                    "Satsang" -> "Satsang & Bhajan"
-                                    "Walking" -> "Morning Walk"
-                                    "Yoga" -> "Yoga & Pranayama"
-                                    "HealthCamp" -> "Health Camp"
+                                    "ALL" -> categoryAll
+                                    "Satsang" -> categorySatsang
+                                    "Walking" -> categoryWalking
+                                    "Yoga" -> categoryYoga
+                                    "HealthCamp" -> categoryHealthCamp
                                     else -> cat
                                 },
                                 style = MaterialTheme.typography.bodyMedium
@@ -111,10 +124,10 @@ fun EventsScreen(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = TerracottaPrimary)
                 }
-            } else if (events.isEmpty()) {
+                } else if (events.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = "Is category mein abhi koi karyakram nahi hai.",
+                        text = stringResource(R.string.events_empty),
                         style = MaterialTheme.typography.bodyLarge,
                         color = TextMediumContrast
                     )
@@ -144,13 +157,13 @@ fun EventsScreen(
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(
                                             imageVector = Icons.Default.Verified,
-                                            contentDescription = "Verified Organizer",
+                                            contentDescription = stringResource(R.string.events_verified),
                                             tint = ForestGreen,
                                             modifier = Modifier.size(20.dp)
                                         )
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(
-                                            text = "Verified",
+                                            text = stringResource(R.string.events_verified),
                                             style = MaterialTheme.typography.labelSmall,
                                             color = ForestGreen,
                                             fontWeight = FontWeight.Bold
@@ -203,12 +216,12 @@ fun EventsScreen(
                                                 modifier = Modifier.size(24.dp)
                                             )
                                             Spacer(modifier = Modifier.width(8.dp))
-                                            Text(
-                                                text = "Aap registered hain (Registered)",
-                                                style = MaterialTheme.typography.titleMedium,
-                                                color = ForestGreen,
-                                                fontWeight = FontWeight.Bold
-                                            )
+                                        Text(
+                                            text = stringResource(R.string.events_registered_text),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = ForestGreen,
+                                            fontWeight = FontWeight.Bold
+                                        )
                                         }
                                         Spacer(modifier = Modifier.height(8.dp))
                                         OutlinedButton(
@@ -216,10 +229,10 @@ fun EventsScreen(
                                                 coroutineScope.launch {
                                                     val res = eventsRepo.unregisterFromEvent(ev.id)
                                                     res.onSuccess {
-                                                        actionStatusMessage = "Karyakram se naam hata diya gaya hai."
+                                                        actionStatusMessage = stringResource(R.string.events_register) + " " + stringResource(R.string.common_cancel) + " " + stringResource(R.string.common_save)
                                                         loadEvents()
                                                     }.onFailure {
-                                                        actionStatusMessage = "Karyakram hatane mein truti: ${it.localizedMessage}"
+                                                        actionStatusMessage = stringResource(R.string.events_register) + " " + stringResource(R.string.common_error) + ": ${it.localizedMessage}"
                                                     }
                                                 }
                                             },
@@ -227,13 +240,13 @@ fun EventsScreen(
                                             colors = ButtonDefaults.outlinedButtonColors(contentColor = SosCrimson),
                                             modifier = Modifier.fillMaxWidth().height(48.dp)
                                         ) {
-                                            Text("Karyakram Chhodein (Cancel RSVP)", fontWeight = FontWeight.Bold)
+                                            Text(stringResource(R.string.events_register) + " " + stringResource(R.string.common_cancel), fontWeight = FontWeight.Bold)
                                         }
                                     }
                                 } else {
-                                    VyavahaarButton(
-                                        text = "Shamil Ho (Join Event)",
-                                        onClick = {
+                                VyavahaarButton(
+                                    text = stringResource(R.string.events_register),
+                                    onClick = {
                                             coroutineScope.launch {
                                                 val res = eventsRepo.registerForEvent(ev.id)
                                                 res.onSuccess {

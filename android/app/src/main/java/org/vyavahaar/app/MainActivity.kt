@@ -1,5 +1,6 @@
 package org.vyavahaar.app
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,17 +9,19 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
+import java.util.Locale
 import org.vyavahaar.app.data.local.PreferencesDataStore
 import org.vyavahaar.app.navigation.Screen
 import org.vyavahaar.app.navigation.VyavahaarNavGraph
 import org.vyavahaar.app.theme.TerracottaPrimary
-import org.vyavahaar.app.theme.WarmCreamBackground
 import org.vyavahaar.app.theme.VyavahaarTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,6 +29,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var preferences: PreferencesDataStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        applySavedLocale()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
@@ -59,7 +63,7 @@ class MainActivity : ComponentActivity() {
                 darkTheme = isDarkTheme,
                 fontScale = fontScale
             ) {
-                Surface(modifier = Modifier.fillMaxSize(), color = WarmCreamBackground) {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     if (!authChecked) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator(color = TerracottaPrimary)
@@ -74,5 +78,15 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun applySavedLocale() {
+        val prefs = PreferencesDataStore(applicationContext)
+        val lang = runBlocking { prefs.preferredLanguage.firstOrNull() } ?: "hi"
+        val locale = Locale(lang)
+        Locale.setDefault(locale)
+        val config = Configuration()
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
     }
 }

@@ -2,8 +2,8 @@
     <string name="app_name">व्यवहार</string>
     <string name="app_tagline">आपके व्यवहार में ही हमारा प्यार है</string>
     <string name="welcome_title">नमस्ते</string>
-    <string name="welcome_subtitle">वरिष्ठ नागरिकों के लिए भारत का पहला आवाज़-आधारित साथी।</string>
-    <string name="get_started">आगे बढ़ें</string>
+    <string name="welcome_subtitle">वरिष्ठ नागरिकों के लिए भारत का पहला आवाज़-आधारित साथी।</string>
+    <string name="get_started">आगे बढ़ें</string>
     <string name="phone_label">मोबाइल नंबर</string>
     <string name="send_otp">ओटीपी भेजें</string>
     <string name="verify_otp">ओटीपी सत्यापित करें</string>
@@ -17,4 +17,155 @@
     <string name="cab_ambulance">कैब व एम्बुलेंस</string>
     <string name="doctors_appointments">डॉक्टर अपॉइंटमेंट</string>
     <string name="prescriptions_medicines">दवाई व पर्ची</string>
+
+    <!-- Home Screen -->
+    <string name="home_greeting">नमस्ते,</string>
+    <string name="home_how_can_help">आज मैं आपकी कैसे मदद कर सकता हूँ?</string>
+    <string name="home_quick_actions">त्वरित कार्य</string>
+    <string name="home_emergency_help">आपातकालीन सहायता</string>
+    <string name="home_book_cab">कैब बुक करें</string>
+    <string name="home_find_events">कार्यक्रम खोजें</string>
+    <string name="home_doctor_appointment">डॉक्टर अपॉइंटमेंट</string>
+    <string name="home_scan_prescription">पर्ची स्कैन करें</string>
+    <string name="home_call_contact">संपर्क को कॉल करें</string>
+    <string name="home_voice_assistant">आवाज़ सहायक</string>
+    <string name="home_tap_mic_speak">माइक दबाएं और बोलें</string>
+    <string name="home_listening">सुन रहे हैं…</string>
+    <string name="home_sos_alert">SOS अलर्ट</string>
+    <string name="home_sos_message">आपातकालीन सेवाओं को सूचित किया जाएगा। जारी रखें?</string>
+    <string name="home_cancel">रद्द करें</string>
+    <string name="home_confirm">पुष्टि करें</string>
+    <string name="home_ok">ठीक है</string>
+
+    <!-- Events Screen -->
+    <string name="events_title">कार्यक्रम और मिलन</string>
+    <string name="events_category_all">सभी</string>
+    <string name="events_category_social">सामाजिक</string>
+    <string name="events_category_health">स्वास्थ्य</string>
+    <string name="events_category_learning">सीखना</string>
+    <string name="events_category_spiritual">आध्यात्मिक</string>
+    <string name="events_empty">आसपास कोई कार्यक्रम नहीं मिला</string>
+    <string name="events_verified">सत्यापित</string>
+    <string name="events_registered">पंजीकृत</string>
+    <string name="events_register">पंजीकरण करें</string>
+    <string name="events_registered_text">आप पंजीकृत हैं</string>
+
+    <!-- Transport Screen -->
+    <string name="transport_title">वाहन और आपातकालीन सहायता</string>
+    <string name="transport_mode_cab">कैब</string>
+    <string name="transport_mode_auto">ऑटो</string>
+    <string name="transport_mode_ambulance">एम्बुलेंस</string>
+    <string name="transport_book_ride">सवारी बुक करें</string>
+    <string name="transport_calling_ambulance">एम्बुलेंस बुला रहे हैं…</string>
+    <string name="transport_ride_booked">सवारी सफलतापूर्वक बुक हुई</string>
+    <string name="transport_booking_failed">बुकिंग विफल। पुनः प्रयास करें।</string>
+    <string name="transport_select_pickup">पिकअप स्थान चुनें</string>
+    <string name="transport_select_drop">ड्रॉप स्थान चुनें</string>
+    <string name="transport_confirm_booking">बुकिंग की पुष्टि करें</string>
+
+    <!-- Appointments Screen -->
+    <string name="appointments_title">डॉक्टर अपॉइंटमेंट और रिमाइंडर</string>
+    <string name="appointments_add_new">नया अपॉइंटमेंट जोड़ें</string>
+    <string name="appointments_empty">कोई अपॉइंटमेंट निर्धारित नहीं</string>
+    <string name="appointments_time_label">समय</string>
+    <string name="appointments_doctor_name">डॉक्टर का नाम</string>
+    <string name="appointments_specialty">विशेषज्ञता</string>
+    <string name="appointments_clinic">क्लिनिक/अस्पताल</string>
+    <string name="appointments_date">तारीख</string>
+    <string name="appointments_time">समय</string>
+    <string name="appointments_notes">नोट्स</string>
+    <string name="appointments_save">सहेजें</string>
+    <string name="appointments_edit">संपादित करें</string>
+    <string name="appointments_delete">हटाएं</string>
+    <string name="appointments_reminder">रिमाइंडर</string>
+    <string name="appointments_reminder_15min">१५ मिनट पहले</string>
+    <string name="appointments_reminder_1hour">१ घंटा पहले</string>
+    <string name="appointments_reminder_1day">१ दिन पहले</string>
+
+    <!-- Prescriptions Screen -->
+    <string name="prescriptions_title">दवाई और पर्ची जानकारी</string>
+    <string name="prescriptions_scan_ocr">डॉक्टर की पर्ची स्कैन करें (OCR)</string>
+    <string name="prescriptions_take_photo">पर्ची की साफ़ फोटो लें और दवाइयों के नाम देखें।</string>
+    <string name="prescriptions_camera_scan">कैमरा से स्कैन</string>
+    <string name="prescriptions_sample_demo">सैंपल डेमो</string>
+    <string name="prescriptions_search_hint">दवाई का नाम खोजें (जैसे: मेटफॉर्मिन, पैरासिटामोल)</string>
+    <string name="prescriptions_ocr_results">OCR नतीजे (डॉक्टर की पर्ची)</string>
+    <string name="prescriptions_confidence">विश्वास</string>
+    <string name="prescriptions_detected_medicines">पता चली दवाइयाँ</string>
+    <string name="prescriptions_find_cheaper">सस्ते विकल्प खोजें</string>
+    <string name="prescriptions_verified_salt">सत्यापित साल्ट</string>
+    <string name="prescriptions_salt_label">साल्ट</string>
+    <string name="prescriptions_manufacturer">निर्माता</string>
+    <string name="prescriptions_dosage_form">रूप</string>
+    <string name="prescriptions_clinical_note">जानकारी</string>
+    <string name="prescriptions_alternatives">किफायती विकल्प</string>
+    <string name="prescriptions_no_alternatives">कोई विकल्प नहीं मिला</string>
+    <string name="prescriptions_price">कीमत</string>
+
+    <!-- Contacts Screen -->
+    <string name="contacts_title">विश्वसनीय संपर्क</string>
+    <string name="contacts_add_new">संपर्क जोड़ें</string>
+    <string name="contacts_empty">कोई विश्वसनीय संपर्क नहीं जोड़ा गया</string>
+    <string name="contacts_name">नाम</string>
+    <string name="contacts_phone">फोन</string>
+    <string name="contacts_relation">रिश्ता</string>
+    <string name="contacts_call">कॉल करें</string>
+    <string name="contacts_video_call">वीडियो कॉल</string>
+    <string name="contacts_sos_contact">SOS संपर्क</string>
+    <string name="contacts_chat_history">चैट इतिहास</string>
+    <string name="contacts_calling">कॉल कर रहे हैं…</string>
+    <string name="contacts_video_calling">वीडियो कॉल कर रहे हैं…</string>
+    <string name="contacts_end_call">कॉल समाप्त करें</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">सेटिंग्स और पहुँच</string>
+    <string name="settings_accessibility">सुगमता और सुविधा</string>
+    <string name="settings_language">भाषा चुनें</string>
+    <string name="settings_text_size">टेक्स्ट का आकार</string>
+    <string name="settings_text_size_preview">नमूना: यह आकार कैसा लग रहा है?</string>
+    <string name="settings_theme">थीम (लाइट / डार्क मोड)</string>
+    <string name="settings_theme_light">लाइट (दिन)</string>
+    <string name="settings_theme_dark">डार्क (रात)</string>
+    <string name="settings_theme_system">सिस्टम डिफ़ॉल्ट</string>
+    <string name="settings_voice_speed">आवाज़ की गति</string>
+    <string name="settings_logout">लॉगआउट करें (साइन आउट)</string>
+    <string name="settings_logout_confirm">क्या आप वाकई लॉगआउट करना चाहते हैं?</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">व्यवहार</string>
+    <string name="login_subtitle">आपके मोबाइल नंबर से सुरक्षित और सरल प्रवेश।</string>
+    <string name="login_sending">भेज रहे हैं…</string>
+
+    <!-- OTP Screen -->
+    <string name="otp_title">OTP दर्ज करें</string>
+    <string name="otp_subtitle">हमने %s पर 6 अंकों का कोड भेजा है।</string>
+    <string name="otp_label">6-अंकों का कोड</string>
+    <string name="otp_verifying">जांच रहे हैं…</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_title">व्यवहार परिवार में स्वागत है</string>
+    <string name="onboarding_subtitle">बस कुछ आसान जानकारी भरें ताकि हम आपकी बेहतर मदद कर सकें।</string>
+    <string name="onboarding_name_label">आपका शुभ नाम</string>
+    <string name="onboarding_language_label">पसंदीदा भाषा</string>
+    <string name="onboarding_text_size_label">टेक्स्ट का आकार</string>
+    <string name="onboarding_text_size_preview">नमूना: यह आकार पढ़ने में आसान है।</string>
+    <string name="onboarding_continue">आगे बढ़ें (पूर्ण)</string>
+    <string name="onboarding_saving">सहेज रहे हैं…</string>
+
+    <!-- Common -->
+    <string name="common_yes">हाँ</string>
+    <string name="common_no">नहीं</string>
+    <string name="common_ok">ठीक है</string>
+    <string name="common_cancel">रद्द करें</string>
+    <string name="common_save">सहेजें</string>
+    <string name="common_edit">संपादित करें</string>
+    <string name="common_delete">हटाएं</string>
+    <string name="common_retry">पुनः प्रयास करें</string>
+    <string name="common_loading">लोड हो रहा है…</string>
+    <string name="common_error">कुछ गलत हो गया</string>
+    <string name="common_permission_needed">अनुमति चाहिए</string>
+    <string name="common_grant_permission">कृपया सेटिंग्स में अनुमति दें</string>
+    <string name="settings_open">सेटिंग्स खोलें</string>
+    <string name="common_summary">सारांश</string>
+    <string name="home_open">खोलें</string>
 </resources>

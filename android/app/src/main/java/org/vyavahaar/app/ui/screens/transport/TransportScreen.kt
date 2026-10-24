@@ -4,8 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.DirectionsCar
@@ -15,9 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.vyavahaar.app.R
 import org.vyavahaar.app.data.local.PreferencesDataStore
 import org.vyavahaar.app.data.remote.ApiClient
 import org.vyavahaar.app.data.remote.TransportDto
@@ -40,13 +45,25 @@ fun TransportScreen(
     var currentTransport by remember { mutableStateOf<TransportDto?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = { VyavahaarTopBar(title = "Gaadi v Aapatkaleen Sahayata", onBackClick = onBack) },
+    // String resources for non-Composable lambdas
+    val transportModeCab = stringResource(R.string.transport_mode_cab)
+    val transportModeAmbulance = stringResource(R.string.transport_mode_ambulance)
+    val transportBookRide = stringResource(R.string.transport_book_ride)
+    val transportCallingAmbulance = stringResource(R.string.transport_calling_ambulance)
+    val transportSelectPickup = stringResource(R.string.transport_select_pickup)
+    val transportSelectDrop = stringResource(R.string.transport_select_drop)
+    val transportConfirmBooking = stringResource(R.string.transport_confirm_booking)
+    val transportCancel = stringResource(R.string.common_cancel)
+    val transportCall112 = stringResource(R.string.sos_calling_112)
+
+        Scaffold(
+        topBar = { VyavahaarTopBar(title = stringResource(R.string.transport_title), onBackClick = onBack) },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -62,9 +79,9 @@ fun TransportScreen(
                     ),
                     modifier = Modifier.weight(1f).height(50.dp)
                 ) {
-                    Icon(Icons.Default.DirectionsCar, contentDescription = null)
+                    Icon(Icons.Default.DirectionsCar, contentDescription = transportModeCab)
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Cab Booking", fontWeight = FontWeight.Bold)
+                    Text(transportModeCab, fontWeight = FontWeight.Bold)
                 }
 
                 Button(
@@ -76,9 +93,9 @@ fun TransportScreen(
                     ),
                     modifier = Modifier.weight(1f).height(50.dp)
                 ) {
-                    Icon(Icons.Default.LocalHospital, contentDescription = null)
+                    Icon(Icons.Default.LocalHospital, contentDescription = transportModeAmbulance)
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Ambulance", fontWeight = FontWeight.Bold)
+                    Text(transportModeAmbulance, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -92,7 +109,7 @@ fun TransportScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Pickup Sthan (From)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(transportSelectPickup, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(6.dp))
                     OutlinedTextField(
                         value = pickupAddress,
@@ -102,7 +119,7 @@ fun TransportScreen(
 
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    Text("Gantavya Sthan (To Destination)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(transportSelectDrop, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(6.dp))
                     OutlinedTextField(
                         value = destinationAddress,
@@ -117,7 +134,7 @@ fun TransportScreen(
             // Action / Booking Card
             if (currentTransport == null) {
                 VyavahaarButton(
-                    text = if (selectedMode == "AMBULANCE") "Aapatkaleen Ambulance Bulaayein (Dispatch)" else "Kiraya Jaankari Le (Get Quote)",
+                    text = if (selectedMode == "AMBULANCE") transportCallingAmbulance else transportBookRide,
                     containerColor = if (selectedMode == "AMBULANCE") SosCrimson else TerracottaPrimary,
                     onClick = {
                         isLoading = true
@@ -146,7 +163,7 @@ fun TransportScreen(
                     ) {
                         Icon(Icons.Default.Call, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Direct 112 Dial Karein", fontWeight = FontWeight.Bold)
+                        Text(transportCall112, fontWeight = FontWeight.Bold)
                     }
                 }
             } else {
@@ -159,29 +176,29 @@ fun TransportScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Status: ${currentTransport!!.status}",
+                            text = "स्थिति: ${currentTransport!!.status}",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = if (currentTransport!!.status == "CONFIRMED") ForestGreen else TerracottaPrimary
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         if (currentTransport!!.fareEstimate != null && currentTransport!!.fareEstimate!! > 0) {
-                            Text("Anumanit Kiraya: ₹${currentTransport!!.fareEstimate}", style = MaterialTheme.typography.bodyLarge)
+                            Text("अनुमानित किराया: ₹${currentTransport!!.fareEstimate}", style = MaterialTheme.typography.bodyLarge)
                         }
 
                         if (currentTransport!!.driverName != null) {
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text("Driver: ${currentTransport!!.driverName}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                            Text("Gaadi: ${currentTransport!!.vehicleModel} (${currentTransport!!.vehicleNumber})", style = MaterialTheme.typography.bodyMedium)
-                            Text("Phone: ${currentTransport!!.driverPhone}", style = MaterialTheme.typography.bodyMedium)
+                            Text("ड्राइवर: ${currentTransport!!.driverName}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                            Text("गाड़ी: ${currentTransport!!.vehicleModel} (${currentTransport!!.vehicleNumber})", style = MaterialTheme.typography.bodyMedium)
+                            Text("फोन: ${currentTransport!!.driverPhone}", style = MaterialTheme.typography.bodyMedium)
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         if (currentTransport!!.status == "QUOTED") {
-                            VyavahaarButton(
-                                text = "Booking Confirm Karein",
-                                onClick = {
+                        VyavahaarButton(
+                            text = transportConfirmBooking,
+                            onClick = {
                                     coroutineScope.launch {
                                         val res = transportRepo.confirmBooking(currentTransport!!.id)
                                         res.onSuccess { currentTransport = it }
@@ -200,7 +217,7 @@ fun TransportScreen(
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Radd Karein (Cancel)", color = SosCrimson, fontWeight = FontWeight.Bold)
+                            Text(transportCancel, color = SosCrimson, fontWeight = FontWeight.Bold)
                         }
                     }
                 }

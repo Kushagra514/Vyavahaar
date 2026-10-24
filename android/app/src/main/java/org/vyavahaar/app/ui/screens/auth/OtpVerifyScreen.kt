@@ -38,7 +38,7 @@ fun OtpVerifyScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
-        topBar = { VyavahaarTopBar(title = "OTP Satyaapan", onBackClick = onBack) },
+        topBar = { VyavahaarTopBar(title = "OTP सत्यापन", onBackClick = onBack) },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
@@ -50,14 +50,14 @@ fun OtpVerifyScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "OTP Darj Karein",
+                text = "OTP दर्ज करें",
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = TextHighContrast
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Humne $phoneNumber par 6 anko ka code bheja hai.",
+                text = "हमने $phoneNumber पर 6 अंकों का कोड भेजा है।",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = TextMediumContrast
@@ -65,10 +65,11 @@ fun OtpVerifyScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // One clean OTP field (>= 48dp, center-aligned large text)
             OutlinedTextField(
                 value = otpCode,
                 onValueChange = { if (it.length <= 6) otpCode = it },
-                label = { Text("6-Digit Code", style = MaterialTheme.typography.bodyLarge) },
+                label = { Text("6-अंकों का कोड", style = MaterialTheme.typography.bodyLarge) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 textStyle = MaterialTheme.typography.headlineMedium.copy(
@@ -76,12 +77,12 @@ fun OtpVerifyScreen(
                     letterSpacing = 8.sp,
                     fontWeight = FontWeight.Bold
                 ),
-                shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth()
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
             )
 
             if (errorMessage != null) {
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = errorMessage!!,
                     color = SosCrimson,
@@ -89,10 +90,10 @@ fun OtpVerifyScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             VyavahaarButton(
-                text = if (isLoading) "Jaanch rahe hain..." else stringResource(R.string.verify_otp),
+                text = if (isLoading) "जांच रहे हैं..." else stringResource(R.string.verify_otp),
                 enabled = otpCode.length >= 4 && !isLoading,
                 onClick = {
                     isLoading = true
