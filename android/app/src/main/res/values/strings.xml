@@ -168,4 +168,49 @@
     <string name="settings_open">Open Settings</string>
     <string name="common_summary">Summary</string>
     <string name="home_open">Open</string>
+
+    <!-- Onboarding language chips -->
+    <string name="onboarding_lang_hindi">Hindi</string>
+    <string name="onboarding_lang_english">English</string>
+    <string name="onboarding_lang_kannada">Kannada</string>
+
+    <!-- Appointments -->
+    <string name="appt_specialty_clinic">%s \u2022 %s</string>
+    <string name="appt_time">Time: %s</string>
+    <string name="appt_book_dialog_title">Book a New Doctor Visit</string>
+    <string name="appt_specialty_label">Specialty</string>
+    <string name="appt_clinic_label">Hospital / Clinic</string>
+    <string name="appt_recurrence_once">Once</string>
+    <string name="appt_recurrence_monthly">Monthly</string>
+    <string name="appt_schedule_btn">Schedule</string>
+
+    <!-- Contacts -->
+    <string name="contacts_video_call_in_progress">Video call being placed</string>
+    <string name="contacts_video_calling_name">%s video call connecting\u2026</string>
+    <string name="contacts_hang_up_btn">End Call (End)</string>
+
+    <!-- Prescriptions -->
+    <string name="prescriptions_scan_title">Doctor's Prescription Scan (OCR)</string>
+    <string name="prescriptions_scan_subtitle">Take a clear photo of the prescription to see the medicine names.</string>
+    <string name="prescriptions_scanning">Scanning\u2026</string>
+    <string name="prescriptions_scan_camera">Scan from Camera</string>
+    <string name="prescriptions_ocr_sample_demo">Sample Demo</string>
+    <string name="prescriptions_search_medicine">Search medicine name (e.g. Metformin, Paracetamol)</string>
+    <string name="prescriptions_confidence">%s%% confidence</string>
+    <string name="prescriptions_search_alternatives">Search Affordable Alternatives</string>
+    <string name="prescriptions_price_value">\u20B9%s</string>
+    <string name="prescriptions_salt">Salt: %s (%s)</string>
+    <string name="prescriptions_note">Info: %s</string>
+    <string name="prescriptions_camera_unavailable">Camera not available. Running sample demo.</string>
+
+    <!-- Transport -->
+    <string name="transport_status">Status: %s</string>
+    <string name="transport_fare">Estimated fare: \u20B9%s</string>
+    <string name="transport_driver">Driver: %s</string>
+    <string name="transport_vehicle">Vehicle: %s (%s)</string>
+    <string name="transport_phone">Phone: %s</string>
+
+    <!-- Settings language chips -->
+    <string name="settings_lang_hindi">Hindi</string>
+    <string name="settings_lang_english">English</string>
 </resources>

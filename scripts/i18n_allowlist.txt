@@ -1,0 +1,4 @@
+# Approved Latin tokens allowed even when language = Hindi.
+Vyavahaar
+OTP
+SOS
