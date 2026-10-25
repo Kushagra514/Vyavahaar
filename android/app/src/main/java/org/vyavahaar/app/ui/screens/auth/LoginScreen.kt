@@ -36,7 +36,7 @@ fun LoginScreen(
     var devHint by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
-        topBar = { VyavahaarTopBar(title = "व्यवहार प्रवेश") },
+        topBar = { VyavahaarTopBar(title = stringResource(R.string.login_bar_title)) },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
@@ -49,14 +49,14 @@ fun LoginScreen(
         ) {
             // Hero block: app name + one-line purpose
             Text(
-                text = "व्यवहार",
+                text = stringResource(R.string.login_title),
                 style = MaterialTheme.typography.headlineLarge,
                 color = TextHighContrast,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "आपके मोबाइल नंबर से सुरक्षित और सरल प्रवेश।",
+                text = stringResource(R.string.login_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = TextMediumContrast,
                 textAlign = TextAlign.Center
@@ -90,7 +90,7 @@ fun LoginScreen(
 
             // ONE full-width primary CTA (min 56dp, TerracottaPrimary via VyavahaarButton)
             VyavahaarButton(
-                text = if (isLoading) "भेज रहे हैं..." else stringResource(R.string.send_otp),
+                text = if (isLoading) stringResource(R.string.login_sending) else stringResource(R.string.send_otp),
                 enabled = phoneNumber.length >= 10 && !isLoading,
                 onClick = {
                     isLoading = true

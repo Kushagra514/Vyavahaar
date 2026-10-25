@@ -143,7 +143,7 @@ fun EventsScreen(
                         if (loadError != null) {
                             Spacer(modifier = Modifier.height(12.dp))
                             Button(onClick = { loadEvents() }) {
-                                Text("Retry")
+                                Text(stringResource(R.string.common_retry))
                             }
                         }
                     }

@@ -176,21 +176,21 @@ fun TransportScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "स्थिति: ${currentTransport!!.status}",
+                            text = stringResource(R.string.transport_status, currentTransport!!.status),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = if (currentTransport!!.status == "CONFIRMED") ForestGreen else TerracottaPrimary
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         if (currentTransport!!.fareEstimate != null && currentTransport!!.fareEstimate!! > 0) {
-                            Text("अनुमानित किराया: ₹${currentTransport!!.fareEstimate}", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.transport_fare, currentTransport!!.fareEstimate), style = MaterialTheme.typography.bodyLarge)
                         }
 
                         if (currentTransport!!.driverName != null) {
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text("ड्राइवर: ${currentTransport!!.driverName}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                            Text("गाड़ी: ${currentTransport!!.vehicleModel} (${currentTransport!!.vehicleNumber})", style = MaterialTheme.typography.bodyMedium)
-                            Text("फोन: ${currentTransport!!.driverPhone}", style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(R.string.transport_driver, currentTransport!!.driverName), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.transport_vehicle, currentTransport!!.vehicleModel, currentTransport!!.vehicleNumber), style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(R.string.transport_phone, currentTransport!!.driverPhone), style = MaterialTheme.typography.bodyMedium)
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))

@@ -38,7 +38,7 @@ fun OtpVerifyScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
-        topBar = { VyavahaarTopBar(title = "OTP सत्यापन", onBackClick = onBack) },
+        topBar = { VyavahaarTopBar(title = stringResource(R.string.otp_bar_title), onBackClick = onBack) },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
@@ -50,14 +50,14 @@ fun OtpVerifyScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "OTP दर्ज करें",
+                text = stringResource(R.string.otp_title),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = TextHighContrast
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "हमने $phoneNumber पर 6 अंकों का कोड भेजा है।",
+                text = stringResource(R.string.otp_subtitle, phoneNumber),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = TextMediumContrast
@@ -69,7 +69,7 @@ fun OtpVerifyScreen(
             OutlinedTextField(
                 value = otpCode,
                 onValueChange = { if (it.length <= 6) otpCode = it },
-                label = { Text("6-अंकों का कोड", style = MaterialTheme.typography.bodyLarge) },
+                label = { Text(stringResource(R.string.otp_label), style = MaterialTheme.typography.bodyLarge) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 textStyle = MaterialTheme.typography.headlineMedium.copy(
@@ -93,7 +93,7 @@ fun OtpVerifyScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             VyavahaarButton(
-                text = if (isLoading) "जांच रहे हैं..." else stringResource(R.string.verify_otp),
+                text = if (isLoading) stringResource(R.string.otp_verifying) else stringResource(R.string.verify_otp),
                 enabled = otpCode.length >= 4 && !isLoading,
                 onClick = {
                     isLoading = true

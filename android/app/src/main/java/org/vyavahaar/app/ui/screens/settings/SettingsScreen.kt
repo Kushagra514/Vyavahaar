@@ -21,6 +21,7 @@ import java.util.Locale
 import org.vyavahaar.app.data.local.PreferencesDataStore
 import org.vyavahaar.app.data.remote.ApiClient
 import org.vyavahaar.app.data.repository.AuthRepository
+import org.vyavahaar.app.R
 import org.vyavahaar.app.theme.*
 import org.vyavahaar.app.ui.components.VyavahaarButton
 import org.vyavahaar.app.ui.components.VyavahaarTopBar
@@ -53,7 +54,7 @@ fun SettingsScreen(
     }
 
         Scaffold(
-        topBar = { VyavahaarTopBar(title = "सेटिंग्स और पहुँच", onBackClick = onBack) },
+        topBar = { VyavahaarTopBar(title = stringResource(R.string.settings_title), onBackClick = onBack) },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
@@ -64,7 +65,7 @@ fun SettingsScreen(
                 .padding(20.dp)
         ) {
             Text(
-                text = "सुगमता और सुविधा (पहुँच)",
+                text = stringResource(R.string.settings_accessibility),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = TextHighContrast
@@ -78,7 +79,7 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("भाषा चुनें (Select Language)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.settings_language), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(
@@ -90,7 +91,7 @@ fun SettingsScreen(
                                     updateAppLocale(context, selectedLang)
                                 }
                             },
-                            label = { Text("हिंदी (Hindi)") }
+                            label = { Text(stringResource(R.string.settings_lang_hindi)) }
                         )
                         FilterChip(
                             selected = selectedLang == "en",
@@ -101,7 +102,7 @@ fun SettingsScreen(
                                     updateAppLocale(context, selectedLang)
                                 }
                             },
-                            label = { Text("English") }
+                            label = { Text(stringResource(R.string.settings_lang_english)) }
                         )
                     }
                 }
@@ -128,7 +129,7 @@ fun SettingsScreen(
                         steps = 2
                     )
                     Text(
-                        text = "नमूना: यह आकार कैसा लग रहा है?",
+                        text = stringResource(R.string.settings_text_size_preview),
                         style = MaterialTheme.typography.bodyLarge.copy(fontSize = (18 * fontScale).sp),
                         color = TerracottaPrimary
                     )
@@ -144,7 +145,7 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("थीम (लाइट / डार्क मोड)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.settings_theme), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(10.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(
@@ -153,7 +154,7 @@ fun SettingsScreen(
                                 selectedTheme = "light"
                                 coroutineScope.launch { preferences.saveAccessibilitySettings(selectedLang, fontScale, voiceSpeed, selectedTheme) }
                             },
-                            label = { Text("Light (Din)") }
+                            label = { Text(stringResource(R.string.settings_theme_light)) }
                         )
                         FilterChip(
                             selected = selectedTheme == "dark",
@@ -161,7 +162,7 @@ fun SettingsScreen(
                                 selectedTheme = "dark"
                                 coroutineScope.launch { preferences.saveAccessibilitySettings(selectedLang, fontScale, voiceSpeed, selectedTheme) }
                             },
-                            label = { Text("Dark (Raat)") }
+                            label = { Text(stringResource(R.string.settings_theme_dark)) }
                         )
                     }
                 }
@@ -183,7 +184,7 @@ fun SettingsScreen(
             ) {
                 Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("लॉगआउट करें (साइन आउट)", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.settings_logout), fontWeight = FontWeight.Bold)
             }
         }
     }

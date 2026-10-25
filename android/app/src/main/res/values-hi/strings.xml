@@ -213,4 +213,14 @@
     <!-- Settings language chips -->
     <string name="settings_lang_hindi">हिंदी</string>
     <string name="settings_lang_english">अंग्रेज़ी</string>
+
+    <!-- Prescriptions OCR result section -->
+    <string name="prescriptions_scan_result_title">ओसीआर नतीजे (डॉक्टर की पर्ची)</string>
+
+    <!-- Top bar / action titles -->
+    <string name="appointments_fab_schedule">अपॉइंटमेंट शेड्यूल करें</string>
+    <string name="appointments_visits_heading">आपके डॉक्टर विजिट</string>
+    <string name="login_bar_title">व्यवहार प्रवेश</string>
+    <string name="otp_bar_title">OTP सत्यापन</string>
+    <string name="contacts_bar_title">अपने लोग (संपर्क)</string>
 </resources>

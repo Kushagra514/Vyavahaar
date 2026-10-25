@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.vyavahaar.app.data.local.PreferencesDataStore
 import org.vyavahaar.app.data.remote.ApiClient
@@ -34,6 +35,7 @@ import org.vyavahaar.app.data.remote.MedicineSearchDto
 import org.vyavahaar.app.data.remote.PrescriptionResponseDto
 import org.vyavahaar.app.data.repository.PrescriptionRepository
 import org.vyavahaar.app.theme.*
+import org.vyavahaar.app.R
 import org.vyavahaar.app.ui.components.VyavahaarButton
 import org.vyavahaar.app.ui.components.VyavahaarTopBar
 
@@ -118,9 +120,9 @@ fun PrescriptionsScreen(
                 Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Default.CameraAlt, contentDescription = null, tint = TerracottaPrimary, modifier = Modifier.size(36.dp))
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("डॉक्टर की पर्ची स्कैन करें (OCR)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.prescriptions_scan_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("पर्ची की साफ़ फोटो लें और दवाइयों के नाम देखें।", style = MaterialTheme.typography.bodyMedium, color = TextMediumContrast)
+                    Text(stringResource(R.string.prescriptions_scan_subtitle), style = MaterialTheme.typography.bodyMedium, color = TextMediumContrast)
                     Spacer(modifier = Modifier.height(12.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
@@ -128,7 +130,7 @@ fun PrescriptionsScreen(
                                 try {
                                     cameraLauncher.launch(null)
                                 } catch (e: Exception) {
-                                    Toast.makeText(context, "कैमरा उपलब्ध नहीं है। सैंपल डेमो चला रहे हैं।", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, stringResource(R.string.prescriptions_camera_unavailable), Toast.LENGTH_SHORT).show()
                                     runSampleOcrDemo()
                                 }
                             },
@@ -137,7 +139,7 @@ fun PrescriptionsScreen(
                             modifier = Modifier.weight(1f).height(48.dp),
                             enabled = !isLoading
                         ) {
-                            Text(if (isLoading) "स्कैन हो रहा..." else "कैमरा से स्कैन", fontWeight = FontWeight.Bold)
+                            Text(if (isLoading) stringResource(R.string.prescriptions_scanning) else stringResource(R.string.prescriptions_scan_camera), fontWeight = FontWeight.Bold)
                         }
                         OutlinedButton(
                             onClick = { runSampleOcrDemo() },
@@ -145,7 +147,7 @@ fun PrescriptionsScreen(
                             modifier = Modifier.weight(1f).height(48.dp),
                             enabled = !isLoading
                         ) {
-                            Text("🧪 सैंपल डेमो", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.prescriptions_ocr_sample_demo), fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -157,7 +159,7 @@ fun PrescriptionsScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                label = { Text("दवाई का नाम खोजें (जैसे: मेटफॉर्मिन, पैरासिटामोल)") },
+                label = { Text(stringResource(R.string.prescriptions_search_medicine)) },
                 trailingIcon = {
                     IconButton(onClick = {
                         coroutineScope.launch {
@@ -193,14 +195,14 @@ fun PrescriptionsScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                 Text(
-                                    text = "OCR नतीजे (डॉक्टर की पर्ची)",
+                                    text = stringResource(R.string.prescriptions_scan_result_title),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = TerracottaPrimary
                                 )
                                     AssistChip(
                                         onClick = {},
-                                        label = { Text("${(scanResult!!.confidenceScore * 100).toInt()}% विश्वास") }
+                                        label = { Text(stringResource(R.string.prescriptions_confidence, (scanResult!!.confidenceScore * 100).toInt())) }
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -241,7 +243,7 @@ fun PrescriptionsScreen(
                                                     }
                                                 }
                                             ) {
-                                                Text("सस्ते विकल्प खोजें", color = ForestGreen, fontWeight = FontWeight.Bold)
+                                                Text(stringResource(R.string.prescriptions_search_alternatives), color = ForestGreen, fontWeight = FontWeight.Bold)
                                             }
                                         }
                                     }
@@ -295,12 +297,12 @@ fun PrescriptionsScreen(
                             Column(modifier = Modifier.padding(14.dp)) {
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                     Text(alt.brandName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                    Text("₹${alt.approximatePriceInr}", style = MaterialTheme.typography.titleMedium, color = ForestGreen, fontWeight = FontWeight.Bold)
+                                    Text(stringResource(R.string.prescriptions_price_value, alt.approximatePriceInr), style = MaterialTheme.typography.titleMedium, color = ForestGreen, fontWeight = FontWeight.Bold)
                                 }
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text("साल्ट: ${alt.activeIngredient} (${alt.strength})", style = MaterialTheme.typography.bodyMedium)
-                                Text("निर्माता: ${alt.manufacturer} \u2022 ${alt.dosageForm}", style = MaterialTheme.typography.bodySmall, color = TextMediumContrast)
-                                Text("जानकारी: ${alt.clinicalNote}", style = MaterialTheme.typography.bodySmall, color = TextHighContrast)
+                                Text(stringResource(R.string.prescriptions_salt, alt.activeIngredient, alt.strength), style = MaterialTheme.typography.bodyMedium)
+                                Text("${stringResource(R.string.prescriptions_manufacturer)}: ${alt.manufacturer} \u2022 ${alt.dosageForm}", style = MaterialTheme.typography.bodySmall, color = TextMediumContrast)
+                                Text(stringResource(R.string.prescriptions_note, alt.clinicalNote), style = MaterialTheme.typography.bodySmall, color = TextHighContrast)
                             }
                         }
                     }

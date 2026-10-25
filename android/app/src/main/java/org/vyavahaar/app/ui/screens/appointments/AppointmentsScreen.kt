@@ -23,6 +23,7 @@ import org.vyavahaar.app.data.remote.ApiClient
 import org.vyavahaar.app.data.remote.AppointmentDto
 import org.vyavahaar.app.data.repository.AppointmentsRepository
 import org.vyavahaar.app.theme.*
+import org.vyavahaar.app.R
 import org.vyavahaar.app.ui.components.VyavahaarButton
 import org.vyavahaar.app.ui.components.VyavahaarTopBar
 
@@ -53,14 +54,14 @@ fun AppointmentsScreen(
     }
 
         Scaffold(
-        topBar = { VyavahaarTopBar(title = "डॉक्टर अपॉइंटमेंट और रिमाइंडर", onBackClick = onBack) },
+        topBar = { VyavahaarTopBar(title = stringResource(R.string.appointments_title), onBackClick = onBack) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showDialog = true },
                 containerColor = TerracottaPrimary,
                 contentColor = WarmCardSurface
             ) {
-                Icon(Icons.Default.Add, contentDescription = "अपॉइंटमेंट शेड्यूल करें")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.appointments_fab_schedule))
             }
         },
         containerColor = WarmCreamBackground
@@ -73,7 +74,7 @@ fun AppointmentsScreen(
                 .padding(16.dp)
         ) {
             Text(
-                text = "आपके डॉक्टर विजिट",
+                text = stringResource(R.string.appointments_visits_heading),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = TextHighContrast
@@ -108,12 +109,12 @@ fun AppointmentsScreen(
                                         label = { Text(appt.recurrenceRule, style = MaterialTheme.typography.labelSmall) }
                                     )
                                 }
-                                Text("${appt.specialty} • ${appt.clinicOrHospital}", style = MaterialTheme.typography.bodyMedium, color = TextMediumContrast)
+                                Text(stringResource(R.string.appt_specialty_clinic, appt.specialty, appt.clinicOrHospital), style = MaterialTheme.typography.bodyMedium, color = TextMediumContrast)
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = TerracottaPrimary, modifier = Modifier.size(20.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
-                                    Text("समय: ${appt.appointmentTime}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                                    Text(stringResource(R.string.appt_time, appt.appointmentTime), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
                                 }
                             }
                         }
@@ -125,15 +126,15 @@ fun AppointmentsScreen(
             if (showDialog) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },
-                title = { Text("नई डॉक्टर विजिट बुक करें", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.appt_book_dialog_title), fontWeight = FontWeight.Bold) },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        OutlinedTextField(value = doctorName, onValueChange = { doctorName = it }, label = { Text("डॉक्टर का नाम") })
-                        OutlinedTextField(value = specialty, onValueChange = { specialty = it }, label = { Text("विशेषज्ञता") })
-                        OutlinedTextField(value = clinic, onValueChange = { clinic = it }, label = { Text("हॉस्पिटल / क्लिनिक") })
+                        OutlinedTextField(value = doctorName, onValueChange = { doctorName = it }, label = { Text(stringResource(R.string.appointments_doctor_name)) })
+                        OutlinedTextField(value = specialty, onValueChange = { specialty = it }, label = { Text(stringResource(R.string.appt_specialty_label)) })
+                        OutlinedTextField(value = clinic, onValueChange = { clinic = it }, label = { Text(stringResource(R.string.appt_clinic_label)) })
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            FilterChip(selected = recurrence == "NONE", onClick = { recurrence = "NONE" }, label = { Text("एक बार") })
-                            FilterChip(selected = recurrence == "MONTHLY", onClick = { recurrence = "MONTHLY" }, label = { Text("मासिक") })
+                            FilterChip(selected = recurrence == "NONE", onClick = { recurrence = "NONE" }, label = { Text(stringResource(R.string.appt_recurrence_once)) })
+                            FilterChip(selected = recurrence == "MONTHLY", onClick = { recurrence = "MONTHLY" }, label = { Text(stringResource(R.string.appt_recurrence_monthly)) })
                         }
                     }
                 },
@@ -148,11 +149,11 @@ fun AppointmentsScreen(
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
                     ) {
-                        Text("शेड्यूल करें")
+                        Text(stringResource(R.string.appt_schedule_btn))
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDialog = false }) { Text("रद्द करें") }
+                    TextButton(onClick = { showDialog = false }) { Text(stringResource(R.string.common_cancel)) }
                 }
             )
         }

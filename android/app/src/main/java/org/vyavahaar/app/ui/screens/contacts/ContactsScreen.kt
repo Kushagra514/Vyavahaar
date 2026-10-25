@@ -30,6 +30,7 @@ import org.vyavahaar.app.data.remote.ApiClient
 import org.vyavahaar.app.data.remote.ContactDto
 import org.vyavahaar.app.data.repository.ContactsRepository
 import org.vyavahaar.app.theme.*
+import org.vyavahaar.app.R
 import org.vyavahaar.app.ui.components.VyavahaarTopBar
 
 @Composable
@@ -51,7 +52,7 @@ fun ContactsScreen(
     }
 
     Scaffold(
-        topBar = { VyavahaarTopBar(title = "अपने लोग (संपर्क)", onBackClick = onBack) },
+        topBar = { VyavahaarTopBar(title = stringResource(R.string.contacts_bar_title), onBackClick = onBack) },
         containerColor = WarmCreamBackground
     ) { innerPadding ->
         Column(
@@ -62,7 +63,7 @@ fun ContactsScreen(
                 .padding(16.dp)
         ) {
             Text(
-                text = "विश्वसनीय संपर्क (विश्वसनीय संपर्क)",
+                text = stringResource(R.string.contacts_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = TextHighContrast
@@ -152,13 +153,13 @@ fun ContactsScreen(
         if (activeCallingName != null) {
             AlertDialog(
                 onDismissRequest = { activeCallingName = null },
-                title = { Text("वीडियो कॉल लगाई जा रही है", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.contacts_video_call_in_progress), fontWeight = FontWeight.Bold) },
                 text = {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Default.Videocam, contentDescription = null, tint = CalmBlue, modifier = Modifier.size(64.dp))
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "$activeCallingName से वीडियो कॉल कनेक्ट हो रही है...",
+                            text = stringResource(R.string.contacts_video_calling_name, activeCallingName),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium
                         )
@@ -169,7 +170,7 @@ fun ContactsScreen(
                         onClick = { activeCallingName = null },
                         colors = ButtonDefaults.buttonColors(containerColor = SosCrimson)
                     ) {
-                        Text("कॉल काटें (समाप्त)")
+                        Text(stringResource(R.string.contacts_hang_up_btn))
                     }
                 }
             )

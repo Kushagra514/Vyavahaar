@@ -12,11 +12,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.vyavahaar.app.data.local.PreferencesDataStore
 import org.vyavahaar.app.data.remote.ApiClient
 import org.vyavahaar.app.data.repository.AuthRepository
 import org.vyavahaar.app.theme.*
+import org.vyavahaar.app.R
 import org.vyavahaar.app.ui.components.VyavahaarButton
 import org.vyavahaar.app.ui.components.VyavahaarTopBar
 
@@ -53,7 +55,7 @@ fun OnboardingScreen(
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "बस कुछ आसान जानकारी भरें ताकि हम आपकी बेहतर मदद कर सकें।",
+                text = stringResource(R.string.onboarding_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = TextMediumContrast
             )
@@ -61,7 +63,7 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Name field
-            Text("आपका शुभ नाम", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.onboarding_name_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = fullName,
@@ -74,30 +76,30 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Preferred Language
-            Text("आपकी पसंदीदा भाषा (Language)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.onboarding_language_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(
                     selected = selectedLanguage == "hi",
                     onClick = { selectedLanguage = "hi" },
-                    label = { Text("हिंदी (Hindi)", style = MaterialTheme.typography.bodyLarge) }
+                    label = { Text(stringResource(R.string.onboarding_lang_hindi), style = MaterialTheme.typography.bodyLarge) }
                 )
                 FilterChip(
                     selected = selectedLanguage == "en",
                     onClick = { selectedLanguage = "en" },
-                    label = { Text("English", style = MaterialTheme.typography.bodyLarge) }
+                    label = { Text(stringResource(R.string.onboarding_lang_english), style = MaterialTheme.typography.bodyLarge) }
                 )
                 FilterChip(
                     selected = selectedLanguage == "kn",
                     onClick = { selectedLanguage = "kn" },
-                    label = { Text("ಕನ್ನಡ (Kannada)", style = MaterialTheme.typography.bodyLarge) }
+                    label = { Text(stringResource(R.string.onboarding_lang_kannada), style = MaterialTheme.typography.bodyLarge) }
                 )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             // Text size accessibility preview
-            Text("अक्षर का आकार (टेक्स्ट साइज़)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.onboarding_text_size_label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(8.dp))
             Slider(
                 value = fontScale,
