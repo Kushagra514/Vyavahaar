@@ -200,4 +200,6 @@ private fun updateAppLocale(context: android.content.Context, languageCode: Stri
     val conf = resources.configuration
     conf.setLocale(locale)
     resources.updateConfiguration(conf, dm)
+    // Recreate the hosting activity so every screen recomposes in the new language
+    (context as? android.app.Activity)?.recreate()
 }

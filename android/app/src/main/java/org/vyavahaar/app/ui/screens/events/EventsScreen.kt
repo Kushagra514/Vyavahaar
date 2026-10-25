@@ -42,6 +42,7 @@ fun EventsScreen(
     var events by remember { mutableStateOf<List<EventDto>>(emptyList()) }
     var selectedCategory by remember { mutableStateOf("ALL") }
     var isLoading by remember { mutableStateOf(true) }
+    var loadError by remember { mutableStateOf<String?>(null) }
     var actionStatusMessage by remember { mutableStateOf<String?>(null) }
 
     val categories = listOf("ALL", "Satsang", "Walking", "Yoga", "HealthCamp")
@@ -53,12 +54,20 @@ fun EventsScreen(
     val categoryYoga = stringResource(R.string.events_category_learning) // Yoga is learning
     val categoryHealthCamp = stringResource(R.string.events_category_health) // Health camp is health
 
+    // Hoisted so they can be used inside coroutine callbacks (non-composable)
+    val eventsRegisterLabel = stringResource(R.string.events_register)
+    val commonCancelLabel = stringResource(R.string.common_cancel)
+    val commonSaveLabel = stringResource(R.string.common_save)
+    val commonErrorLabel = stringResource(R.string.common_error)
+
     fun loadEvents() {
         coroutineScope.launch {
             isLoading = true
+            loadError = null
             val res = eventsRepo.getEvents(if (selectedCategory == "ALL") null else selectedCategory)
             isLoading = false
             res.onSuccess { events = it }
+            res.onFailure { loadError = it.localizedMessage ?: "Failed to load events" }
         }
     }
 
@@ -73,7 +82,6 @@ fun EventsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
         ) {
@@ -126,11 +134,19 @@ fun EventsScreen(
                 }
                 } else if (events.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = stringResource(R.string.events_empty),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = TextMediumContrast
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = loadError ?: stringResource(R.string.events_empty),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = TextMediumContrast
+                        )
+                        if (loadError != null) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Button(onClick = { loadEvents() }) {
+                                Text("Retry")
+                            }
+                        }
+                    }
                 }
             } else {
                 LazyColumn(
@@ -229,10 +245,10 @@ fun EventsScreen(
                                                 coroutineScope.launch {
                                                     val res = eventsRepo.unregisterFromEvent(ev.id)
                                                     res.onSuccess {
-                                                        actionStatusMessage = stringResource(R.string.events_register) + " " + stringResource(R.string.common_cancel) + " " + stringResource(R.string.common_save)
+                                                        actionStatusMessage = "$eventsRegisterLabel $commonCancelLabel $commonSaveLabel"
                                                         loadEvents()
                                                     }.onFailure {
-                                                        actionStatusMessage = stringResource(R.string.events_register) + " " + stringResource(R.string.common_error) + ": ${it.localizedMessage}"
+                                                        actionStatusMessage = "$eventsRegisterLabel $commonErrorLabel: ${it.localizedMessage}"
                                                     }
                                                 }
                                             },
