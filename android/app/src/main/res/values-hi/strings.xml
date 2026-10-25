@@ -168,4 +168,16 @@
     <string name="settings_open">सेटिंग्स खोलें</string>
     <string name="common_summary">सारांश</string>
     <string name="home_open">खोलें</string>
+    <string name="sos_protected_title">आपातकालीन SOS सुरक्षा</string>
+    <string name="sos_protected_subtitle">गलती से बटन दबा? नीचे हरा रद्द बटन दबाएं या सहायता चुनें:</string>
+    <string name="sos_demo_mode_on">सेफ डेमो / टेस्ट मोड: चालू</string>
+    <string name="sos_demo_mode_live">लाइव आपातकालीन मोड: सक्रिय</string>
+    <string name="sos_direct_112_title">112 सीधा आपातकालीन कॉल</string>
+    <string name="sos_direct_112_sub">तुरंत पुलिस / एम्बुलेंस • बिना इंटरनेट काम करता है</string>
+    <string name="sos_caregiver_alert_title">परिवार / केयरगिवर अलर्ट</string>
+    <string name="sos_caregiver_alert_sub">GPS लोकेशन और आपातकालीन संदेश भेजें</string>
+    <string name="sos_safe_demo_btn">सेफ डेमो / जज टेस्ट मोड चलाएं</string>
+    <string name="sos_safe_demo_sub">बिना असली कॉल के SOS और लोकेशन टेस्ट करें</string>
+    <string name="sos_mistake_cancel">गलती से दब गया — रद्द करें (मैं सुरक्षित हूँ)</string>
+    <string name="sos_offline_fallback_title">नेटवर्क बंद — सीधा 112 कॉल तैयार</string>
 </resources>

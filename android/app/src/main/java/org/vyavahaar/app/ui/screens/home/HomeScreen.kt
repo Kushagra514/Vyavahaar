@@ -71,9 +71,27 @@ fun HomeScreen(
     val cabAmbulance = stringResource(R.string.cab_ambulance)
     val contactsCall = stringResource(R.string.contacts_call)
 
-    var showSosDialog by remember { mutableStateOf(false) }
-    var sosAlertDetails by remember { mutableStateOf<String?>(null) }
     var showPermissionRationaleDialog by remember { mutableStateOf(false) }
+    var sosCountdownSeconds by remember { mutableStateOf(5) }
+    var sosCountdownPaused by remember { mutableStateOf(false) }
+
+    // 5-second accidental-trigger safety countdown when SOS confirmation modal opens
+    LaunchedEffect(uiState.sosState, sosCountdownPaused) {
+        if (uiState.sosState == SosEmergencyState.CONFIRMING && !sosCountdownPaused) {
+            sosCountdownSeconds = 5
+            while (sosCountdownSeconds > 0 && uiState.sosState == SosEmergencyState.CONFIRMING && !sosCountdownPaused) {
+                kotlinx.coroutines.delay(1000)
+                sosCountdownSeconds -= 1
+            }
+            if (sosCountdownSeconds <= 0 && uiState.sosState == SosEmergencyState.CONFIRMING && !sosCountdownPaused) {
+                val isTest = uiState.sosDemoMode
+                viewModel.triggerSosAlertBackend(isTestMode = isTest)
+                if (!isTest) {
+                    viewModel.triggerSos { intent -> context.startActivity(intent) }
+                }
+            }
+        }
+    }
 
     // Helper: open an installed ride-hailing app (Uber -> Rapido -> Ola), fallback to Transport screen
     val launchRideApp = {
@@ -113,7 +131,10 @@ fun HomeScreen(
                 "scan_prescription", "search_medicine_information" -> onNavigateToPrescriptions()
                 "start_call" -> onNavigateToContacts()
                 "change_accessibility_settings" -> onNavigateToSettings()
-                "send_sos_alert" -> showSosDialog = true
+                "send_sos_alert" -> {
+                    sosCountdownPaused = false
+                    viewModel.openSosConfirmation()
+                }
                 else -> { }
             }
             viewModel.dismissToolCall()
@@ -300,23 +321,26 @@ fun HomeScreen(
 
             // Upper-middle: Red SOS Button matching reference screenshot
             Button(
-                onClick = { showSosDialog = true },
-                shape = RoundedCornerShape(12.dp),
+                onClick = {
+                    sosCountdownPaused = false
+                    viewModel.openSosConfirmation()
+                },
+                shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = SosCrimson,
                     contentColor = OnSosCrimson
                 ),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
                 modifier = Modifier
-                    .width(180.dp)
-                    .height(60.dp)
+                    .width(200.dp)
+                    .height(62.dp)
                     .semantics {
-                        contentDescription = "SOS emergency button. Tap to call 112 emergency services immediately"
+                        contentDescription = "SOS emergency button. Opens accidental-trigger protected 112 and caregiver alert menu"
                         role = Role.Button
                     }
             ) {
                 Text(
-                    text = stringResource(R.string.sos_label),
+                    text = "🚨 " + stringResource(R.string.sos_label),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 0.sp
@@ -325,20 +349,19 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Pill status indicator below SOS button from mockup
-            Box(
-                modifier = Modifier
-                    .width(120.dp)
-                    .height(24.dp)
-                    .border(width = 2.dp, color = SosCrimson, shape = RoundedCornerShape(12.dp))
-                    .background(Color.Transparent),
-                contentAlignment = Alignment.Center
+            // "+ Parivaar" (Add Guardian) button below SOS button
+            OutlinedButton(
+                onClick = onNavigateToContacts,
+                shape = RoundedCornerShape(20.dp),
+                border = androidx.compose.foundation.BorderStroke(2.dp, SosCrimson),
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 4.dp),
+                modifier = Modifier.height(36.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.sos_calling_112),
-                    style = MaterialTheme.typography.labelSmall,
+                    text = "+ Parivaar",
+                    style = MaterialTheme.typography.labelLarge,
                     color = SosCrimson,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.ExtraBold
                 )
             }
 
@@ -461,7 +484,10 @@ fun HomeScreen(
                                         "scan_prescription" -> onNavigateToPrescriptions()
                                         "start_call" -> onNavigateToContacts()
                                         "change_accessibility_settings" -> onNavigateToSettings()
-                                        "send_sos_alert" -> { showSosDialog = true }
+                                        "send_sos_alert" -> {
+                                            sosCountdownPaused = false
+                                            viewModel.openSosConfirmation()
+                                        }
                                         else -> viewModel.dismissAssistant()
                                     }
                                 },
@@ -557,102 +583,167 @@ fun HomeScreen(
             )
         }
 
-        // Accidental-Trigger Protected Emergency SOS Dialog
-        if (showSosDialog) {
+        // 1. Accidental-Trigger Protected Emergency SOS Confirmation Dialog
+        if (uiState.sosState == SosEmergencyState.CONFIRMING || uiState.sosState == SosEmergencyState.DISPATCHING) {
             AlertDialog(
-                onDismissRequest = { showSosDialog = false },
+                onDismissRequest = { viewModel.cancelSos(autoTimeout = false) },
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Warning, contentDescription = null, tint = SosCrimson)
-                        Spacer(modifier = Modifier.width(8.dp))
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        // Small Live Toggle on Top
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
-                                text = stringResource(R.string.home_sos_alert),
+                                text = "Live",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = if (!uiState.sosDemoMode) SosCrimson else TextHighContrast
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Switch(
+                                checked = !uiState.sosDemoMode,
+                                onCheckedChange = { viewModel.toggleSosDemoMode() }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        // Heading
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.Warning, contentDescription = null, tint = SosCrimson)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.sos_protected_title),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = SosCrimson
                             )
+                        }
                     }
                 },
                 text = {
-                    Column {
-                        Text(
-                            text = stringResource(R.string.home_sos_message),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(
-                            onClick = {
-                                showSosDialog = false
-                                viewModel.triggerSos { intent -> context.startActivity(intent) }
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = SosCrimson),
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
-                            Text(stringResource(R.string.sos_calling_112), fontWeight = FontWeight.Bold)
-                        }
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Button(
-                            onClick = {
-                                showSosDialog = false
-                                viewModel.triggerSosAlertBackend(isTestMode = false) { details ->
-                                    sosAlertDetails = details
+                    // Cancel Timer Just Below Heading
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = WarmCreamBackground,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "⏳ Cancel Timer: ${sosCountdownSeconds}s",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = SosCrimson
+                                )
+                                Button(
+                                    onClick = { viewModel.cancelSos(autoTimeout = false) },
+                                    colors = ButtonDefaults.buttonColors(containerColor = SosCrimson),
+                                    shape = RoundedCornerShape(10.dp),
+                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+                                ) {
+                                    Text(
+                                        text = "✕ " + stringResource(R.string.common_cancel),
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.White
+                                    )
                                 }
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary),
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
-                            Text(stringResource(R.string.contacts_sos_contact), fontWeight = FontWeight.Bold)
-                        }
-                        Spacer(modifier = Modifier.height(10.dp))
-                        OutlinedButton(
-                            onClick = {
-                                showSosDialog = false
-                                viewModel.triggerSosAlertBackend(isTestMode = true) { details ->
-                                    sosAlertDetails = details
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
-                            Text(stringResource(R.string.prescriptions_sample_demo), fontWeight = FontWeight.Bold)
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            LinearProgressIndicator(
+                                progress = { sosCountdownSeconds / 5f },
+                                color = SosCrimson,
+                                trackColor = Color.LightGray,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(8.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                            )
                         }
                     }
                 },
                 confirmButton = {},
-                dismissButton = {
-                    TextButton(onClick = { showSosDialog = false }) {
-                        Text(stringResource(R.string.common_cancel), color = TextHighContrast)
-                    }
-                }
+                dismissButton = {}
             )
         }
 
-        // Safe Demo / SOS Alert Dispatch Details Feedback Dialog
-        if (sosAlertDetails != null) {
+        // 2. Simple SOS Result Dialog
+        if (uiState.sosState == SosEmergencyState.DISPATCHED_TEST ||
+            uiState.sosState == SosEmergencyState.DISPATCHED_LIVE ||
+            uiState.sosState == SosEmergencyState.ERROR_OFFLINE_FALLBACK
+        ) {
+            val isOfflineError = uiState.sosState == SosEmergencyState.ERROR_OFFLINE_FALLBACK
+            val alert = uiState.sosAlertResponse
             AlertDialog(
-                onDismissRequest = { sosAlertDetails = null },
+                onDismissRequest = { viewModel.closeSosResult() },
                 title = {
-                        Text(
-                            text = stringResource(R.string.home_sos_alert) + " " + stringResource(R.string.common_summary),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = ForestGreen
-                        )
+                    Text(
+                        text = "🚨 Emergency Called",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = SosCrimson
+                    )
                 },
                 text = {
-                    Text(
-                        text = sosAlertDetails!!,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Column(
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "📞 Emergency (112) Called",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = SosCrimson
+                        )
+
+                        if (isOfflineError) {
+                            Text(
+                                text = "⚠️ No one notified — No internet connection.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = TerracottaPrimary
+                            )
+                        } else if (alert != null) {
+                            val names = if (alert.guardianDispatches.isNotEmpty()) {
+                                alert.guardianDispatches.map { it.name }
+                            } else {
+                                alert.notifiedContactNames.map { it.substringBefore(" (").trim() }
+                            }
+
+                            if (names.isNotEmpty()) {
+                                names.forEach { personName ->
+                                    Text(
+                                        text = "✅ $personName Notified",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = ForestGreen
+                                    )
+                                }
+                            } else {
+                                Text(
+                                    text = "⚠️ No one notified — No guardians added in + Parivaar.",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TerracottaPrimary
+                                )
+                            }
+                        }
+                    }
                 },
                 confirmButton = {
                     Button(
-                        onClick = { sosAlertDetails = null },
-                        colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
+                        onClick = { viewModel.closeSosResult() },
+                        colors = ButtonDefaults.buttonColors(containerColor = ForestGreen)
                     ) {
-                        Text(stringResource(R.string.common_ok), fontWeight = FontWeight.Bold)
+                        Text("✓ Done", fontWeight = FontWeight.Bold)
                     }
                 }
             )

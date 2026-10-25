@@ -168,4 +168,16 @@
     <string name="settings_open">Open Settings</string>
     <string name="common_summary">Summary</string>
     <string name="home_open">Open</string>
+    <string name="sos_protected_title">Emergency SOS Protection</string>
+    <string name="sos_protected_subtitle">Pressed by mistake? Tap the green Cancel button below or choose an emergency action:</string>
+    <string name="sos_demo_mode_on">Safe Judge Demo Mode: ON</string>
+    <string name="sos_demo_mode_live">LIVE Emergency Mode: ACTIVE</string>
+    <string name="sos_direct_112_title">112 Direct Emergency Call</string>
+    <string name="sos_direct_112_sub">Immediate Police / Ambulance • Works Offline</string>
+    <string name="sos_caregiver_alert_title">Alert Caregivers &amp; Family</string>
+    <string name="sos_caregiver_alert_sub">Send GPS Location &amp; Emergency Alert</string>
+    <string name="sos_safe_demo_btn">1-Click Judge Safe Test Run</string>
+    <string name="sos_safe_demo_sub">Test SOS + GPS + Caregivers without real calls</string>
+    <string name="sos_mistake_cancel">Pressed by Mistake — Cancel (I Am Safe)</string>
+    <string name="sos_offline_fallback_title">Network Offline — Direct 112 Ready</string>
 </resources>

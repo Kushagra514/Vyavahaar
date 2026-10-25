@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime, timezone
+import urllib.parse
+import re
 import uuid
 
 from app.core.database import get_db
@@ -13,6 +15,7 @@ from app.schemas.profile import (
     ProfileUpdate,
     EmergencyContactCreate,
     EmergencyContactResponse,
+    GuardianDispatchChannel,
     SosAlertRequest,
     SosAlertResponse
 )
@@ -103,17 +106,37 @@ def trigger_sos_alert(
 
     contacts = db.query(EmergencyContact).filter(EmergencyContact.user_id == user_id).all()
     contact_summaries = [f"{c.name} ({c.relationship_type}): {c.phone_number}" for c in contacts]
+    phone_numbers = [c.phone_number for c in contacts]
     
     user_name = user.name or "Aadarniya Sadasya"
     loc_name = payload.location_name or "Bengaluru"
-    loc_str = f"near {loc_name} (Lat: {payload.location_latitude}, Lon: {payload.location_longitude})"
+    lat = payload.location_latitude if payload.location_latitude is not None else 12.9716
+    lon = payload.location_longitude if payload.location_longitude is not None else 77.5946
+    google_maps_url = f"https://maps.google.com/?q={lat},{lon}"
+    loc_str = f"near {loc_name} (Lat: {lat}, Lon: {lon})"
     
     alert_tag = "[EMERGENCY ALERT - TEST MODE / SIMULATION]" if payload.is_test_mode else "[CRITICAL EMERGENCY SOS ALERT]"
     message_body = (
         f"{alert_tag} {user_name} (Phone: {user.phone_number}) has triggered an emergency alert {loc_str}. "
+        f"Live GPS Map: {google_maps_url} | "
         f"Emergency Type: {payload.emergency_type}. Direct dialing 112 initiated. Please check on them immediately."
     )
     
+    encoded_msg = urllib.parse.quote(message_body)
+    guardian_dispatches = []
+    for c in contacts:
+        clean_digits = re.sub(r"[^\d]", "", c.phone_number)
+        guardian_dispatches.append(
+            GuardianDispatchChannel(
+                name=c.name,
+                phone_number=c.phone_number,
+                relationship_type=c.relationship_type,
+                whatsapp_url=f"https://wa.me/{clean_digits}?text={encoded_msg}",
+                sms_url=f"sms:{c.phone_number}?body={encoded_msg}"
+            )
+        )
+
+    sms_batch_uri = f"smsto:{';'.join(phone_numbers)}?body={encoded_msg}" if phone_numbers else ""
     status_label = "SIMULATED_TEST_DISPATCHED" if payload.is_test_mode else "ACTIVE_ALERT_DISPATCHED"
     alert_id = f"SOS-{user_id}-{uuid.uuid4().hex[:8].upper()}"
 
@@ -126,6 +149,10 @@ def trigger_sos_alert(
         direct_call_target="112",
         notified_contacts_count=len(contacts),
         notified_contacts=contact_summaries,
+        notified_phone_numbers=phone_numbers,
+        google_maps_url=google_maps_url,
+        sms_batch_uri=sms_batch_uri,
+        guardian_dispatches=guardian_dispatches,
         alert_message_payload=message_body,
         timestamp=datetime.now(timezone.utc)
     )

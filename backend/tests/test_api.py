@@ -241,6 +241,12 @@ def test_sos_emergency_alert_safe_test_mode():
     assert sos_data["notified_contacts_count"] >= 1
     assert "TEST MODE" in sos_data["alert_message_payload"]
     assert "Cubbon Park" in sos_data["alert_message_payload"]
+    assert sos_data["google_maps_url"] == "https://maps.google.com/?q=12.9716,77.5946"
+    assert "https://maps.google.com/?q=12.9716,77.5946" in sos_data["alert_message_payload"]
+    assert sos_data["sms_batch_uri"].startswith("smsto:")
+    assert len(sos_data["guardian_dispatches"]) >= 1
+    assert sos_data["guardian_dispatches"][0]["whatsapp_url"].startswith("https://wa.me/")
+    assert sos_data["guardian_dispatches"][0]["sms_url"].startswith("sms:")
 
     # 2. Test in live mode format
     live_sos_resp = client.post(

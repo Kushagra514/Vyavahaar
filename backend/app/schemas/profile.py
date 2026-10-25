@@ -47,6 +47,13 @@ class SosAlertRequest(BaseModel):
     location_longitude: Optional[float] = Field(77.5946, description="Optional GPS longitude")
     location_name: Optional[str] = Field("Bengaluru", description="Readable landmark/location")
 
+class GuardianDispatchChannel(BaseModel):
+    name: str
+    phone_number: str
+    relationship_type: str
+    whatsapp_url: str
+    sms_url: str
+
 class SosAlertResponse(BaseModel):
     alert_id: str
     user_id: int
@@ -56,5 +63,9 @@ class SosAlertResponse(BaseModel):
     direct_call_target: str = "112"
     notified_contacts_count: int
     notified_contacts: List[str]
+    notified_phone_numbers: List[str] = []
+    google_maps_url: str = ""
+    sms_batch_uri: str = ""
+    guardian_dispatches: List[GuardianDispatchChannel] = []
     alert_message_payload: str
     timestamp: datetime

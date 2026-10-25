@@ -184,6 +184,14 @@ data class SosAlertRequestDto(
     @SerializedName("location_name") val locationName: String = "Bengaluru"
 )
 
+data class GuardianDispatchChannelDto(
+    @SerializedName("name") val name: String,
+    @SerializedName("phone_number") val phoneNumber: String,
+    @SerializedName("relationship_type") val relationshipType: String,
+    @SerializedName("whatsapp_url") val whatsappUrl: String,
+    @SerializedName("sms_url") val smsUrl: String
+)
+
 data class SosAlertResponseDto(
     @SerializedName("alert_id") val alertId: String,
     @SerializedName("user_id") val userId: Int,
@@ -193,6 +201,10 @@ data class SosAlertResponseDto(
     @SerializedName("direct_call_target") val directCallTarget: String,
     @SerializedName("notified_contacts_count") val notifiedContactsCount: Int,
     @SerializedName("notified_contacts") val notifiedContacts: List<String>,
+    @SerializedName("notified_phone_numbers") val notifiedPhoneNumbers: List<String> = emptyList(),
+    @SerializedName("google_maps_url") val googleMapsUrl: String = "",
+    @SerializedName("sms_batch_uri") val smsBatchUri: String = "",
+    @SerializedName("guardian_dispatches") val guardianDispatches: List<GuardianDispatchChannelDto> = emptyList(),
     @SerializedName("alert_message_payload") val alertMessagePayload: String,
     @SerializedName("timestamp") val timestamp: String
 )
