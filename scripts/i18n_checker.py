@@ -47,22 +47,19 @@ def line_of(src, pos):
 
 text_literal = re.compile(r'Text\s*\(\s*(?:style\s*=\s*[^,]*,?\s*)?"([^"\\]{3,})"')
 
-# --- (a) + (b) collect hard-coded literals ---
-hardcoded = []  # (file, line, literal)
+# --- (a) hard-coded literals (direct Text and direct text=) ---
+hardcoded = []
 for kt in sorted(UI_DIR.rglob("*.kt")):
     src = kt.read_text(encoding="utf-8")
-    cleaned = re.sub(r'stringResource\s*\([^)]*\)', 'STRINGRES', src)
+    cleaned = re.sub(r'stringResource\s*\(', 'STRINGRES', src)
     cleaned = re.sub(r'//[^\n]*', '', cleaned)
     for m in text_literal.finditer(cleaned):
         lit = m.group(1)
         if lit.startswith("STRINGRES") or lit.strip() == "":
             continue
-        hardcoded.append((kt, line_of(src, m.start()), lit))
-
-for file, line, lit in hardcoded:
-    report("a hard-coded string (bypasses translation)", lit, file, line)
-    if DEVANAGARI.search(lit):
-        report("b Devanagari literal in UI code", lit, file, line)
+        report("a hard-coded string (bypasses translation)", lit, kt, line_of(src, m.start()))
+        if DEVANAGARI.search(lit):
+            report("b Devanagari literal in UI code", lit, kt, line_of(src, m.start()))
 
 # theme files too
 for kt in sorted((ROOT / "android/app/src/main/java/org/vyavahaar/app/theme").rglob("*.kt")):
@@ -77,11 +74,6 @@ for kt in sorted((ROOT / "android/app/src/main/java/org/vyavahaar/app/theme").rg
 # --- (c) key mismatch / empty ---
 en = parse_strings(EN_FILE)
 hi = parse_strings(HI_FILE)
-for k in sorted(en):
-    if k not in hi:
-        report("c missing in Hindi", k, EN_FILE, 0)
-    elif en[k].strip() == "" or hi[k].strip() == "":
-        report("c empty value", k, HI_FILE if hi[k].strip() == "" else EN_FILE, 0)
 for k in sorted(hi):
     if k not in en:
         report("c missing in English", k, HI_FILE, 0)

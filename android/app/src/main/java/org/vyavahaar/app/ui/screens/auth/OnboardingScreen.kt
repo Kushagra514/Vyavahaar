@@ -48,7 +48,7 @@ fun OnboardingScreen(
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = "व्यवहार परिवार में स्वागत है",
+                text = stringResource(R.string.onboarding_welcome),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = TextHighContrast
@@ -108,7 +108,7 @@ fun OnboardingScreen(
                 steps = 2
             )
             Text(
-                text = "नमूना: यह आकार पढ़ने में आसान है।",
+                text = stringResource(R.string.onboarding_size_note),
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = (18 * fontScale).sp),
                 color = TerracottaPrimary,
                 fontWeight = FontWeight.Medium

@@ -8,8 +8,11 @@ import java.util.concurrent.TimeUnit
 
 object ApiClient {
     // 10.0.2.2 points to host machine from Android Emulator; 127.0.0.1 for local testing
-    // Override for physical device: -Dvyavahaar.baseUrl=http://<your-computer-ip>:8000/
-    var baseUrl: String = System.getProperty("vyavahaar.baseUrl", "http://10.120.195.32:8000/")
+    // Host machine: use `adb reverse tcp:8000 tcp:8000` and `http://127.0.0.1:8000/`
+    // when running on a physical device. Override with -Dvyavahaar.baseUrl=<your-lan-ip>:8000/
+    // during debug if adb reverse is not available.
+    var baseUrl: String =
+        System.getProperty("vyavahaar.baseUrl") ?: "http://127.0.0.1:8000/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

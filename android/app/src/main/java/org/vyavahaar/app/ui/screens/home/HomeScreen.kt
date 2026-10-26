@@ -192,11 +192,11 @@ fun HomeScreen(
     )
 
     Scaffold(
-        containerColor = WarmCreamBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             // Accessible 3-Item Bottom Navigation Bar matching reference design
             Surface(
-                color = WarmCreamBackground,
+                color = MaterialTheme.colorScheme.background,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 12.dp)
@@ -221,7 +221,7 @@ fun HomeScreen(
                         Icon(
                             imageVector = Icons.Default.AddCircle,
                             contentDescription = null,
-                            tint = TextHighContrast,
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(40.dp)
                         )
                     }
@@ -239,7 +239,7 @@ fun HomeScreen(
                         Icon(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = null,
-                            tint = TextHighContrast,
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(40.dp)
                         )
                     }
@@ -257,7 +257,7 @@ fun HomeScreen(
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = null,
-                            tint = TextHighContrast,
+                            tint = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.size(40.dp)
                         )
                     }
@@ -283,14 +283,14 @@ fun HomeScreen(
                 Text(
                     text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineLarge,
-                    color = TextHighContrast,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = "${stringResource(R.string.home_greeting)}\n${if (uiState.userName == "Sadasya") stringResource(R.string.welcome_title) else uiState.userName}",
                     style = MaterialTheme.typography.titleLarge,
-                    color = TextHighContrast,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Medium,
                     lineHeight = 30.sp
                 )
@@ -330,14 +330,14 @@ fun HomeScreen(
                 modifier = Modifier
                     .width(120.dp)
                     .height(24.dp)
-                    .border(width = 2.dp, color = SosCrimson, shape = RoundedCornerShape(12.dp))
-                    .background(Color.Transparent),
+                    .border(width = 2.dp, color = MaterialTheme.colorScheme.error, shape = RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = stringResource(R.string.sos_calling_112),
                     style = MaterialTheme.typography.labelSmall,
-                    color = SosCrimson,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -388,7 +388,7 @@ fun HomeScreen(
                     stringResource(R.string.mic_tap_prompt)
                 },
                 style = MaterialTheme.typography.titleMedium,
-                color = TextHighContrast,
+                color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -423,7 +423,7 @@ fun HomeScreen(
             AnimatedVisibility(visible = uiState.assistantFeedback.isNotEmpty()) {
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = WarmCardSurface),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -434,21 +434,21 @@ fun HomeScreen(
                             Icon(
                                 imageVector = Icons.Default.VolumeUp,
                                 contentDescription = null,
-                                tint = TerracottaPrimary
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = stringResource(R.string.app_name) + " " + stringResource(R.string.home_voice_assistant),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = TerracottaPrimary
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = uiState.assistantFeedback,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = TextHighContrast
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         if (uiState.activeToolCall != null) {
                             Spacer(modifier = Modifier.height(12.dp))
@@ -467,7 +467,7 @@ fun HomeScreen(
                                 },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (uiState.activeToolCall?.toolName == "send_sos_alert") SosCrimson else TerracottaPrimary
+                                    containerColor = if (uiState.activeToolCall?.toolName == "send_sos_alert") SosCrimson else MaterialTheme.colorScheme.primary
                                 )
                             ) {
                                 Text(
@@ -505,14 +505,14 @@ fun HomeScreen(
                 confirmButton = {
                     Button(
                         onClick = { viewModel.confirmConsequentialAction() },
-                        colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text(stringResource(R.string.common_yes) + ", " + stringResource(R.string.common_ok), fontWeight = FontWeight.Bold)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.cancelConsequentialAction() }) {
-                        Text(stringResource(R.string.common_cancel), color = TextHighContrast)
+                        Text(stringResource(R.string.common_cancel), color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
             )
@@ -544,14 +544,14 @@ fun HomeScreen(
                             }
                             context.startActivity(appSettingsIntent)
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text(stringResource(R.string.settings_open), fontWeight = FontWeight.Bold)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showPermissionRationaleDialog = false }) {
-                        Text(stringResource(R.string.common_cancel), color = TextHighContrast)
+                        Text(stringResource(R.string.common_cancel), color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
             )
@@ -563,13 +563,13 @@ fun HomeScreen(
                 onDismissRequest = { showSosDialog = false },
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Warning, contentDescription = null, tint = SosCrimson)
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
                         Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = stringResource(R.string.home_sos_alert),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = SosCrimson
+                                color = MaterialTheme.colorScheme.onError
                             )
                     }
                 },
@@ -599,7 +599,7 @@ fun HomeScreen(
                                     sosAlertDetails = details
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                             modifier = Modifier.fillMaxWidth().height(48.dp),
                             shape = RoundedCornerShape(10.dp)
                         ) {
@@ -623,7 +623,7 @@ fun HomeScreen(
                 confirmButton = {},
                 dismissButton = {
                     TextButton(onClick = { showSosDialog = false }) {
-                        Text(stringResource(R.string.common_cancel), color = TextHighContrast)
+                        Text(stringResource(R.string.common_cancel), color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
             )
@@ -650,7 +650,7 @@ fun HomeScreen(
                 confirmButton = {
                     Button(
                         onClick = { sosAlertDetails = null },
-                        colors = ButtonDefaults.buttonColors(containerColor = TerracottaPrimary)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text(stringResource(R.string.common_ok), fontWeight = FontWeight.Bold)
                     }

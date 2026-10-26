@@ -69,7 +69,7 @@ fun LoginScreen(
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
                 label = { Text(stringResource(R.string.phone_label), style = MaterialTheme.typography.bodyLarge) },
-                prefix = { Text("+91 ", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) },
+                prefix = { Text(stringResource(R.string.phone_country_code) + " ", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 singleLine = true,
                 textStyle = MaterialTheme.typography.titleLarge,

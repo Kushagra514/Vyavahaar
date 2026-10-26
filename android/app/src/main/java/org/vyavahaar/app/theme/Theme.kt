@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
-    primary = TerracottaPrimary,
+    primary = DarkPrimary,
     onPrimary = LightOnPrimary,
     primaryContainer = TerracottaContainer,
     onPrimaryContainer = TerracottaPrimary,

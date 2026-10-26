@@ -19,6 +19,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -151,6 +152,7 @@ fun ContactsScreen(
 
         // In-App Video Call Simulation Dialog
         if (activeCallingName != null) {
+                val callingName = activeCallingName
             AlertDialog(
                 onDismissRequest = { activeCallingName = null },
                 title = { Text(stringResource(R.string.contacts_video_call_in_progress), fontWeight = FontWeight.Bold) },
@@ -159,7 +161,7 @@ fun ContactsScreen(
                         Icon(Icons.Default.Videocam, contentDescription = null, tint = CalmBlue, modifier = Modifier.size(64.dp))
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = stringResource(R.string.contacts_video_calling_name, activeCallingName),
+                            text = stringResource(R.string.contacts_video_calling_name, callingName ?: ""),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium
                         )

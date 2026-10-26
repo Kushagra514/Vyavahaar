@@ -130,7 +130,7 @@ fun PrescriptionsScreen(
                                 try {
                                     cameraLauncher.launch(null)
                                 } catch (e: Exception) {
-                                    Toast.makeText(context, stringResource(R.string.prescriptions_camera_unavailable), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.prescriptions_camera_unavailable), Toast.LENGTH_SHORT).show()
                                     runSampleOcrDemo()
                                 }
                             },
@@ -274,7 +274,7 @@ fun PrescriptionsScreen(
                         ) {
                             Column(modifier = Modifier.padding(12.dp)) {
                                 Text(
-                                    text = "सत्यापित साल्ट: ${searchResult!!.matchedSalt}",
+                                    text = stringResource(R.string.prescriptions_verified_salt_item, searchResult!!.matchedSalt),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = ForestGreen

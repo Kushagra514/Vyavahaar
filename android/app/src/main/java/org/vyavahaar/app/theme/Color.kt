@@ -97,20 +97,20 @@ val Indigo900 = Color(0xFF312E81)
 // =============================================================================
 // LIGHT THEME - Warm, bright, paper-like
 // =============================================================================
-val LightBackground       = Neutral050      // #FDFBF7 - Warm paper white
-val LightSurface          = Neutral100      // #FAF6F0 - Slightly elevated
-val LightSurfaceVariant   = Neutral200      // #F0ECE3 - Input fields, chips
+val LightBackground       = Color(0xFFFAF6EE) // #FAF6EE - Warm paper white
+val LightSurface          = Color(0xFFFAF6F0) // #FAF6F0 - Slightly elevated
+val LightSurfaceVariant   = Color(0xFFF0ECE3) // #F0ECE3 - Input fields, chips
 val LightSurfaceHigh      = Color.White     // #FFFFFF - Modal, FAB
 val LightOutline          = Neutral300      // #E0D9CC - Borders, dividers
 val LightOutlineVariant   = Neutral400      // #C8BFAF - Subtle borders
 
-val LightOnBackground     = Neutral900      // #2E2A23 - Primary text
-val LightOnSurface        = Neutral800      // #4E483E - On cards
+val LightOnBackground     = Color(0xFF1F2933) // #1F2933 - Primary text
+val LightOnSurface        = Color(0xFF1F2933) // #1F2933 - On cards
 val LightOnSurfaceVariant = Neutral600      // #8A8172 - Secondary text
 val LightInverseSurface   = Neutral900      // For modals on dark
 val LightInverseOnSurface = Neutral050
 
-val LightPrimary          = Terracotta600   // #D45A36 - Main actions
+val LightPrimary          = Color(0xFF0F5C6E) // #0F5C6E - Main actions
 val LightOnPrimary        = Color.White
 val LightPrimaryContainer = Terracotta100   // #FDEAE4 - Filled buttons
 val LightOnPrimaryContainer = Terracotta900 // #732E20
@@ -141,21 +141,21 @@ val LightScrim            = Color(0x99000000)
 // =============================================================================
 // DARK THEME - Rich, warm, layered - NOT flat black
 // =============================================================================
-val DarkBackground        = Neutral950      // #1A1814 - Deep warm near-black
-val DarkSurface           = Neutral900      // #2E2A23 - Base surface
-val DarkSurfaceVariant    = Neutral800      // #4E483E - Elevated cards, inputs
+val DarkBackground        = Color(0xFF161A1E) // #161A1E - Deep warm near-black
+val DarkSurface           = Color(0xFF232421) // #232421 - Base surface
+val DarkSurfaceVariant    = Color(0xFF3A3934) // #3A3934 - Elevated cards, inputs
 val DarkSurfaceHigh       = Neutral800      // #4E483E - Modal, dialogs
 val DarkOutline           = Neutral700      // #6D6558 - Visible borders
 val DarkOutlineVariant    = Neutral600      // #8A8172 - Subtle dividers
 
-val DarkOnBackground      = Neutral050      // #FAF6F0 - Primary text (warm white)
-val DarkOnSurface         = Neutral050      // #FAF6F0 - On cards
+val DarkOnBackground      = Color(0xFFEDE8DC) // #EDE8DC - Primary text (warm white)
+val DarkOnSurface         = Color(0xFFEDE8DC) // #EDE8DC - On cards
 val DarkOnSurfaceVariant  = Neutral400      // #C8BFAF - Secondary text
 val DarkInverseSurface    = Neutral100      // For modals on light
 val DarkInverseOnSurface  = Neutral900
 
-val DarkPrimary           = Terracotta400   // #F48060 - Brighter for dark bg
-val DarkOnPrimary         = Neutral950      // #1A1814
+val DarkPrimary           = Color(0xFF8FD0DF) // #8FD0DF - Brighter for dark bg
+val DarkOnPrimary         = Color(0xFF161A1E) // #161A1E
 val DarkPrimaryContainer  = Terracotta800   // #963A28 - Filled buttons
 val DarkOnPrimaryContainer = Terracotta50   // #FEF7F5
 

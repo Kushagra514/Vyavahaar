@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -84,7 +85,7 @@ fun AppointmentsScreen(
             if (appointments.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = "अभी कोई अपॉइंटमेंट दर्ज नहीं है।\nनीचे '+' बटन दबाकर जोड़ें।",
+                        text = stringResource(R.string.appointments_empty_detail),
                         style = MaterialTheme.typography.bodyLarge,
                         color = TextMediumContrast
                     )

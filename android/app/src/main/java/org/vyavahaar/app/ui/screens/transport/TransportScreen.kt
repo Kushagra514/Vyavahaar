@@ -167,6 +167,7 @@ fun TransportScreen(
                     }
                 }
             } else {
+                val ct = currentTransport!!
                 // Booking status display card
                 Card(
                     shape = RoundedCornerShape(16.dp),
@@ -176,31 +177,31 @@ fun TransportScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = stringResource(R.string.transport_status, currentTransport!!.status),
+                            text = stringResource(R.string.transport_status, ct!!.status),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = if (currentTransport!!.status == "CONFIRMED") ForestGreen else TerracottaPrimary
+                            color = if (ct!!.status == "CONFIRMED") ForestGreen else TerracottaPrimary
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        if (currentTransport!!.fareEstimate != null && currentTransport!!.fareEstimate!! > 0) {
-                            Text(stringResource(R.string.transport_fare, currentTransport!!.fareEstimate), style = MaterialTheme.typography.bodyLarge)
+                        if (ct!!.fareEstimate != null && ct!!.fareEstimate!! > 0) {
+                            Text(stringResource(R.string.transport_fare, ct!!.fareEstimate), style = MaterialTheme.typography.bodyLarge)
                         }
 
-                        if (currentTransport!!.driverName != null) {
+                        if (ct!!.driverName != null) {
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(stringResource(R.string.transport_driver, currentTransport!!.driverName), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                            Text(stringResource(R.string.transport_vehicle, currentTransport!!.vehicleModel, currentTransport!!.vehicleNumber), style = MaterialTheme.typography.bodyMedium)
-                            Text(stringResource(R.string.transport_phone, currentTransport!!.driverPhone), style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(R.string.transport_driver, ct!!.driverName ?: ""), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.transport_vehicle, ct!!.vehicleModel ?: "", ct!!.vehicleNumber ?: ""), style = MaterialTheme.typography.bodyMedium)
+                            Text(stringResource(R.string.transport_phone, ct!!.driverPhone ?: ""), style = MaterialTheme.typography.bodyMedium)
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        if (currentTransport!!.status == "QUOTED") {
+                        if (ct!!.status == "QUOTED") {
                         VyavahaarButton(
                             text = transportConfirmBooking,
                             onClick = {
                                     coroutineScope.launch {
-                                        val res = transportRepo.confirmBooking(currentTransport!!.id)
+                                        val res = transportRepo.confirmBooking(ct!!.id)
                                         res.onSuccess { currentTransport = it }
                                     }
                                 }
@@ -211,7 +212,7 @@ fun TransportScreen(
                         TextButton(
                             onClick = {
                                 coroutineScope.launch {
-                                    val res = transportRepo.cancelBooking(currentTransport!!.id)
+                                    val res = transportRepo.cancelBooking(ct!!.id)
                                     res.onSuccess { currentTransport = null }
                                 }
                             },
