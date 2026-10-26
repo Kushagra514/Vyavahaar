@@ -90,7 +90,7 @@
     <string name="prescriptions_sample_demo">सैंपल डेमो</string>
     <string name="prescriptions_search_hint">दवाई का नाम खोजें (जैसे: मेटफॉर्मिन, पैरासिटामोल)</string>
     <string name="prescriptions_ocr_results">OCR नतीजे (डॉक्टर की पर्ची)</string>
-    <string name="prescriptions_confidence">%s%% विश्वास</string>
+    <string name="prescriptions_confidence">विश्वास</string>
     <string name="prescriptions_detected_medicines">पता चली दवाइयाँ</string>
     <string name="prescriptions_find_cheaper">सस्ते विकल्प खोजें</string>
     <string name="prescriptions_verified_salt">सत्यापित साल्ट</string>
@@ -168,65 +168,16 @@
     <string name="settings_open">सेटिंग्स खोलें</string>
     <string name="common_summary">सारांश</string>
     <string name="home_open">खोलें</string>
-
-    <!-- Onboarding language chips -->
-    <string name="onboarding_lang_hindi">हिंदी</string>
-    <string name="onboarding_lang_english">अंग्रेज़ी</string>
-    <string name="onboarding_lang_kannada">कन्नड़</string>
-
-    <!-- Appointments -->
-    <string name="appt_specialty_clinic">%1$s • %2$s</string>
-    <string name="appt_time">समय: %s</string>
-    <string name="appt_book_dialog_title">नया डॉक्टर विजिट बुक करें</string>
-    <string name="appt_specialty_label">विशेषज्ञता</string>
-    <string name="appt_clinic_label">हॉस्पिटल / क्लिनिक</string>
-    <string name="appt_recurrence_once">एक बार</string>
-    <string name="appt_recurrence_monthly">मासिक</string>
-    <string name="appt_schedule_btn">शेड्यूल करें</string>
-
-    <!-- Contacts -->
-    <string name="contacts_video_call_in_progress">वीडियो कॉल लगाई जा रही है</string>
-    <string name="contacts_video_calling_name">%s से वीडियो कॉल कनेक्ट हो रही है…</string>
-    <string name="contacts_hang_up_btn">कॉल काटें (समाप्त)</string>
-
-    <!-- Prescriptions -->
-    <string name="prescriptions_scan_title">डॉक्टर की पर्ची स्कैन करें (OCR)</string>
-    <string name="prescriptions_scan_subtitle">पर्ची की साफ़ फोटो लें और दवाइयों के नाम देखें।</string>
-    <string name="prescriptions_scanning">स्कैन हो रहा…</string>
-    <string name="prescriptions_scan_camera">कैमरा से स्कैन</string>
-    <string name="prescriptions_ocr_sample_demo">🧪 सैंपल डेमो</string>
-    <string name="prescriptions_search_medicine">दवाई का नाम खोजें (जैसे: मेटफॉर्मिन, पैरासिटामोल)</string>
-    <string name="prescriptions_search_alternatives">सस्ते विकल्प खोजें</string>
-    <string name="prescriptions_price_value">₹%s</string>
-    <string name="prescriptions_salt">साल्ट: %1$s (%2$s)</string>
-    <string name="prescriptions_note">जानकारी: %s</string>
-    <string name="prescriptions_camera_unavailable">कैमरा उपलब्ध नहीं है। सैंपल डेमो चला रहे हैं।</string>
-
-    <!-- Transport -->
-    <string name="transport_status">स्थिति: %s</string>
-    <string name="transport_fare">अनुमानित किराया: ₹%s</string>
-    <string name="transport_driver">ड्राइवर: %s</string>
-    <string name="transport_vehicle">गाड़ी: %1$s (%2$s)</string>
-    <string name="transport_phone">फोन: %s</string>
-
-    <!-- Settings language chips -->
-    <string name="settings_lang_hindi">हिंदी</string>
-    <string name="settings_lang_english">अंग्रेज़ी</string>
-
-    <!-- Prescriptions OCR result section -->
-    <string name="prescriptions_scan_result_title">ओसीआर नतीजे (डॉक्टर की पर्ची)</string>
-
-    <!-- Top bar / action titles -->
-    <string name="appointments_fab_schedule">अपॉइंटमेंट शेड्यूल करें</string>
-    <string name="appointments_visits_heading">आपके डॉक्टर विजिट</string>
-    <string name="login_bar_title">व्यवहार प्रवेश</string>
-    <string name="otp_bar_title">OTP सत्यापन</string>
-    <string name="contacts_bar_title">अपने लोग (संपर्क)</string>
-    <string name="phone_country_code">+91</string>
-    <string name="settings_font_size">अक्षरों का आकार (टेक्स्ट साइज़)</string>
-    <string name="appointments_empty_detail">कोई अपॉइंटमेंट निर्धारित नहीं।&#10;+ बटन दबाकर जोड़ें।</string>
-
-    <string name="prescriptions_verified_salt_item">सत्यापित साल्ट: %1$s</string>
-    <string name="onboarding_welcome">व्यवहार परिवार में स्वागत है</string>
-    <string name="onboarding_size_note">नमूना: यह आकार पढ़ने में आसान है।</string>
+    <string name="sos_protected_title">आपातकालीन SOS सुरक्षा</string>
+    <string name="sos_protected_subtitle">गलती से बटन दबा? नीचे हरा रद्द बटन दबाएं या सहायता चुनें:</string>
+    <string name="sos_demo_mode_on">सेफ डेमो / टेस्ट मोड: चालू</string>
+    <string name="sos_demo_mode_live">लाइव आपातकालीन मोड: सक्रिय</string>
+    <string name="sos_direct_112_title">112 सीधा आपातकालीन कॉल</string>
+    <string name="sos_direct_112_sub">तुरंत पुलिस / एम्बुलेंस • बिना इंटरनेट काम करता है</string>
+    <string name="sos_caregiver_alert_title">परिवार / केयरगिवर अलर्ट</string>
+    <string name="sos_caregiver_alert_sub">GPS लोकेशन और आपातकालीन संदेश भेजें</string>
+    <string name="sos_safe_demo_btn">सेफ डेमो / जज टेस्ट मोड चलाएं</string>
+    <string name="sos_safe_demo_sub">बिना असली कॉल के SOS और लोकेशन टेस्ट करें</string>
+    <string name="sos_mistake_cancel">गलती से दब गया — रद्द करें (मैं सुरक्षित हूँ)</string>
+    <string name="sos_offline_fallback_title">नेटवर्क बंद — सीधा 112 कॉल तैयार</string>
 </resources>

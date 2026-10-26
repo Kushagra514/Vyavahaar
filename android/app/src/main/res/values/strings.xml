@@ -90,7 +90,7 @@
     <string name="prescriptions_sample_demo">Sample Demo</string>
     <string name="prescriptions_search_hint">Search medicine name (e.g. Metformin, Paracetamol)</string>
     <string name="prescriptions_ocr_results">OCR Results (Doctor Prescription)</string>
-    <string name="prescriptions_confidence">%s%% confidence</string>
+    <string name="prescriptions_confidence">Confidence</string>
     <string name="prescriptions_detected_medicines">Detected Medicines</string>
     <string name="prescriptions_find_cheaper">Find Cheaper Alternatives</string>
     <string name="prescriptions_verified_salt">Verified Salt</string>
@@ -168,64 +168,16 @@
     <string name="settings_open">Open Settings</string>
     <string name="common_summary">Summary</string>
     <string name="home_open">Open</string>
-
-    <!-- Onboarding language chips -->
-    <string name="onboarding_lang_hindi">Hindi</string>
-    <string name="onboarding_lang_english">English</string>
-    <string name="onboarding_lang_kannada">Kannada</string>
-
-    <!-- Appointments -->
-    <string name="appt_specialty_clinic">%1$s \u2022 %2$s</string>
-    <string name="appt_time">Time: %s</string>
-    <string name="appt_book_dialog_title">Book a New Doctor Visit</string>
-    <string name="appt_specialty_label">Specialty</string>
-    <string name="appt_clinic_label">Hospital / Clinic</string>
-    <string name="appt_recurrence_once">Once</string>
-    <string name="appt_recurrence_monthly">Monthly</string>
-    <string name="appt_schedule_btn">Schedule</string>
-
-    <!-- Contacts -->
-    <string name="contacts_video_call_in_progress">Video call being placed</string>
-    <string name="contacts_video_calling_name">%s video call connecting\u2026</string>
-    <string name="contacts_hang_up_btn">End Call (End)</string>
-
-    <!-- Prescriptions -->
-    <string name="prescriptions_scan_title">Doctor\'s Prescription Scan (OCR)</string>
-    <string name="prescriptions_scan_subtitle">Take a clear photo of the prescription to see the medicine names.</string>
-    <string name="prescriptions_scanning">Scanning\u2026</string>
-    <string name="prescriptions_scan_camera">Scan from Camera</string>
-    <string name="prescriptions_ocr_sample_demo">Sample Demo</string>
-    <string name="prescriptions_search_medicine">Search medicine name (e.g. Metformin, Paracetamol)</string>
-    <string name="prescriptions_search_alternatives">Search Affordable Alternatives</string>
-    <string name="prescriptions_price_value">\u20B9%s</string>
-    <string name="prescriptions_salt">Salt: %1$s (%2$s)</string>
-    <string name="prescriptions_note">Info: %s</string>
-    <string name="prescriptions_camera_unavailable">Camera not available. Running sample demo.</string>
-
-    <!-- Transport -->
-    <string name="transport_status">Status: %s</string>
-    <string name="transport_fare">Estimated fare: \u20B9%s</string>
-    <string name="transport_driver">Driver: %s</string>
-    <string name="transport_vehicle">Vehicle: %1$s (%2$s)</string>
-    <string name="transport_phone">Phone: %s</string>
-
-    <!-- Settings language chips -->
-    <string name="settings_lang_hindi">Hindi</string>
-    <string name="settings_lang_english">English</string>
-
-    <!-- Prescriptions OCR result section -->
-    <string name="prescriptions_scan_result_title">OCR Results (Doctor\'s Prescription)</string>
-
-    <!-- Top bar / action titles -->
-    <string name="appointments_fab_schedule">Schedule Appointment</string>
-    <string name="appointments_visits_heading">Your Doctor Visits</string>
-    <string name="login_bar_title">Vyavahaar Entry</string>
-    <string name="otp_bar_title">OTP Verification</string>
-    <string name="contacts_bar_title">My People (Contacts)</string>
-    <string name="phone_country_code">+91</string>
-    <string name="settings_font_size">Font size (Text size)</string>
-    <string name="appointments_empty_detail">No appointments scheduled.&#10;Tap + to add one.</string>
-    <string name="prescriptions_verified_salt_item">Verified Salt: %1$s</string>
-    <string name="onboarding_welcome">Welcome to Vyavahaar Family</string>
-    <string name="onboarding_size_note">Sample: This font size is easier to read.</string>
+    <string name="sos_protected_title">Emergency SOS Protection</string>
+    <string name="sos_protected_subtitle">Pressed by mistake? Tap the green Cancel button below or choose an emergency action:</string>
+    <string name="sos_demo_mode_on">Safe Judge Demo Mode: ON</string>
+    <string name="sos_demo_mode_live">LIVE Emergency Mode: ACTIVE</string>
+    <string name="sos_direct_112_title">112 Direct Emergency Call</string>
+    <string name="sos_direct_112_sub">Immediate Police / Ambulance • Works Offline</string>
+    <string name="sos_caregiver_alert_title">Alert Caregivers &amp; Family</string>
+    <string name="sos_caregiver_alert_sub">Send GPS Location &amp; Emergency Alert</string>
+    <string name="sos_safe_demo_btn">1-Click Judge Safe Test Run</string>
+    <string name="sos_safe_demo_sub">Test SOS + GPS + Caregivers without real calls</string>
+    <string name="sos_mistake_cancel">Pressed by Mistake — Cancel (I Am Safe)</string>
+    <string name="sos_offline_fallback_title">Network Offline — Direct 112 Ready</string>
 </resources>

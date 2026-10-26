@@ -15,6 +15,7 @@ import org.vyavahaar.app.data.local.PreferencesDataStore
 import org.vyavahaar.app.data.remote.AllowlistedToolCallDto
 import org.vyavahaar.app.data.remote.ApiClient
 import org.vyavahaar.app.data.remote.SosAlertRequestDto
+import org.vyavahaar.app.data.remote.SosAlertResponseDto
 import org.vyavahaar.app.data.remote.VoiceCommandResponseDto
 import org.vyavahaar.app.data.repository.AssistantRepository
 import java.util.Locale
@@ -30,6 +31,16 @@ enum class VoiceAssistantState {
     ERROR
 }
 
+enum class SosEmergencyState {
+    IDLE,
+    CONFIRMING,
+    DISPATCHING,
+    DISPATCHED_TEST,
+    DISPATCHED_LIVE,
+    DIALING_112,
+    ERROR_OFFLINE_FALLBACK
+}
+
 data class HomeUiState(
     val userName: String = "Sadasya",
     val preferredLanguage: String = "hi",
@@ -40,7 +51,12 @@ data class HomeUiState(
     val activeToolCall: AllowlistedToolCallDto? = null,
     val showConfirmationDialog: Boolean = false,
     val confirmationPrompt: String = "",
-    val statusMessage: String = "Sabhi sevaayein taiyaar hain (All services ready)"
+    val statusMessage: String = "Sabhi sevaayein taiyaar hain (All services ready)",
+    val sosState: SosEmergencyState = SosEmergencyState.IDLE,
+    val sosDemoMode: Boolean = true,
+    val sosEmergencyType: String = "GENERAL_SOS",
+    val sosAlertResponse: SosAlertResponseDto? = null,
+    val sosErrorReason: String? = null
 ) {
     val isListening: Boolean get() = voiceState == VoiceAssistantState.LISTENING
 }
@@ -250,6 +266,54 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
+    fun openSosConfirmation() {
+        tts?.stop()
+        _uiState.value = _uiState.value.copy(
+            sosState = SosEmergencyState.CONFIRMING,
+            sosAlertResponse = null,
+            sosErrorReason = null,
+            statusMessage = "SOS Suraksha Khuli Hai (SOS Protection Active)"
+        )
+        speak("Aapatkaal suraksha khuli hai. Galti se daba ho toh hara cancel button dabayein, ya sahayata chunein.")
+    }
+
+    fun cancelSos(autoTimeout: Boolean = false) {
+        tts?.stop()
+        val feedback = if (autoTimeout) {
+            "Koi vikalp nahi chuna gaya, aapatkaal window surakshit roop se band kar di gayi."
+        } else {
+            "Theek hai, aapatkaal alert radd kar diya gaya hai. Aap surakshit hain."
+        }
+        _uiState.value = _uiState.value.copy(
+            sosState = SosEmergencyState.IDLE,
+            sosAlertResponse = null,
+            sosErrorReason = null,
+            assistantFeedback = feedback,
+            statusMessage = "Sabhi sevaayein taiyaar hain"
+        )
+        speak(feedback)
+    }
+
+    fun closeSosResult() {
+        _uiState.value = _uiState.value.copy(
+            sosState = SosEmergencyState.IDLE,
+            sosAlertResponse = null,
+            sosErrorReason = null
+        )
+    }
+
+    fun toggleSosDemoMode() {
+        _uiState.value = _uiState.value.copy(
+            sosDemoMode = !_uiState.value.sosDemoMode
+        )
+    }
+
+    fun selectSosEmergencyType(type: String) {
+        _uiState.value = _uiState.value.copy(
+            sosEmergencyType = type
+        )
+    }
+
     fun triggerSos(onDirectCall: (Intent) -> Unit) {
         tts?.stop()
         speak("112 emergency dialing shuru kar rahe hain.")
@@ -260,16 +324,49 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         onDirectCall(callIntent)
     }
 
-    fun triggerSosAlertBackend(isTestMode: Boolean, onComplete: (String) -> Unit) {
+    fun buildParivaarSmsIntent(alert: SosAlertResponseDto): Intent {
+        val recipients = alert.notifiedPhoneNumbers.joinToString(";")
+        return Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("smsto:$recipients")
+            putExtra("sms_body", alert.alertMessagePayload)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+    }
+
+    fun buildExternalUriIntent(url: String): Intent {
+        return Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+    }
+
+    fun simulateSosOfflineFailure() {
+        tts?.stop()
+        val errMsg = "Internet sampark vifal raha, parantu ghabrayein nahi. Aap seedha 112 par call kar sakte hain."
+        _uiState.value = _uiState.value.copy(
+            sosState = SosEmergencyState.ERROR_OFFLINE_FALLBACK,
+            sosAlertResponse = null,
+            sosErrorReason = "Simulated Offline / Server Unreachable (HTTP 503) — Direct 112 Fallback Active",
+            assistantFeedback = errMsg,
+            statusMessage = "OFFLINE_112_FALLBACK_ACTIVE"
+        )
+        speak(errMsg)
+    }
+
+    fun triggerSosAlertBackend(isTestMode: Boolean, onComplete: (String) -> Unit = {}) {
+        _uiState.value = _uiState.value.copy(
+            sosState = SosEmergencyState.DISPATCHING,
+            statusMessage = "SOS Alert bheja ja raha hai..."
+        )
         viewModelScope.launch {
             try {
                 val token = preferences.authToken.firstOrNull() ?: ""
+                val selectedType = _uiState.value.sosEmergencyType
                 val resp = ApiClient.apiService.triggerSosAlert(
                     token = "Bearer $token",
                     req = SosAlertRequestDto(
                         isTestMode = isTestMode,
-                        emergencyType = if (isTestMode) "DEMO_TEST_SOS" else "GENERAL_SOS",
-                        locationName = "Bengaluru (Elder Residence)"
+                        emergencyType = selectedType,
+                        locationName = "Indiranagar, Bengaluru (Elder Residence)"
                     )
                 )
                 if (resp.isSuccessful && resp.body() != null) {
@@ -279,18 +376,36 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     } else {
                         "Emergency SOS Alert bheja gaya: 112 aur parivar ko soochit kiya gaya."
                     }
-                    _uiState.value = _uiState.value.copy(assistantFeedback = msg, statusMessage = alert.status)
+                    _uiState.value = _uiState.value.copy(
+                        sosState = if (alert.isTestMode) SosEmergencyState.DISPATCHED_TEST else SosEmergencyState.DISPATCHED_LIVE,
+                        sosAlertResponse = alert,
+                        sosErrorReason = null,
+                        assistantFeedback = msg,
+                        statusMessage = alert.status
+                    )
                     speak(msg)
                     onComplete(alert.alertMessagePayload)
                 } else {
-                    val errMsg = "SOS server sampark vifal raha. Direct 112 dial karein."
-                    _uiState.value = _uiState.value.copy(assistantFeedback = errMsg)
+                    val errMsg = "SOS server sampark vifal raha (HTTP ${resp.code()}). Direct 112 dial karein."
+                    _uiState.value = _uiState.value.copy(
+                        sosState = SosEmergencyState.ERROR_OFFLINE_FALLBACK,
+                        sosAlertResponse = null,
+                        sosErrorReason = errMsg,
+                        assistantFeedback = errMsg,
+                        statusMessage = "OFFLINE_112_FALLBACK_ACTIVE"
+                    )
                     speak(errMsg)
                     onComplete(errMsg)
                 }
             } catch (e: Exception) {
-                val errMsg = "SOS alert error: ${e.localizedMessage}. Direct 112 dial karein."
-                _uiState.value = _uiState.value.copy(assistantFeedback = errMsg)
+                val errMsg = "SOS network error: ${e.localizedMessage ?: "Offline"}. Direct 112 dial karein."
+                _uiState.value = _uiState.value.copy(
+                    sosState = SosEmergencyState.ERROR_OFFLINE_FALLBACK,
+                    sosAlertResponse = null,
+                    sosErrorReason = errMsg,
+                    assistantFeedback = errMsg,
+                    statusMessage = "OFFLINE_112_FALLBACK_ACTIVE"
+                )
                 speak(errMsg)
                 onComplete(errMsg)
             }

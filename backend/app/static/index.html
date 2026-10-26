@@ -85,7 +85,7 @@
 
         /* Red SOS Button from Mockup */
         .sos-wrapper {
-            margin: 28px 0 16px 0;
+            margin: 22px 0 12px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -97,29 +97,72 @@
             font-size: calc(22px * var(--font-scale));
             font-weight: 800;
             letter-spacing: 2px;
-            border: none;
-            border-radius: 14px;
+            border: 3px solid rgba(255, 255, 255, 0.35);
+            border-radius: 16px;
             padding: 14px 44px;
             cursor: pointer;
             box-shadow: 0 6px 18px rgba(186, 26, 26, 0.4);
-            transition: transform 0.15s, background-color 0.2s;
-            width: 190px;
+            transition: transform 0.15s, background-color 0.2s, box-shadow 0.2s;
+            min-width: 210px;
+            min-height: 62px;
             text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-sos:hover {
+            box-shadow: 0 8px 24px rgba(186, 26, 26, 0.55);
         }
 
         .btn-sos:active {
             transform: scale(0.95);
         }
 
-        .sos-status-pill {
-            margin-top: 12px;
+        .btn-add-parivaar {
+            margin-top: 10px;
             border: 2px solid var(--sos-red);
+            background: #FFFFFF;
             border-radius: 20px;
-            padding: 4px 18px;
-            font-size: 13px;
-            font-weight: 700;
+            padding: 6px 20px;
+            font-size: 14px;
+            font-weight: 800;
             color: var(--sos-red);
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(186, 26, 26, 0.15);
+            transition: transform 0.12s ease, background 0.15s ease;
+        }
+
+        .btn-add-parivaar:hover {
+            background: var(--sos-bg);
+        }
+
+        .btn-add-parivaar:active {
+            transform: scale(0.96);
+        }
+
+        .parivaar-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-warm);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .parivaar-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1.5px solid #CCC;
+            font-size: 14px;
+            margin-bottom: 8px;
+            background: var(--surface-card);
+            color: var(--text-high);
         }
 
         /* Center Big Push-to-Talk Microphone */
@@ -295,28 +338,234 @@
             margin-top: 10px;
         }
 
-        /* SOS Alert Modal */
+        /* SOS Alert Modal & Accidental-Trigger Protection UI */
         .modal {
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.65);
+            background: rgba(0,0,0,0.74);
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: 14px;
             z-index: 99;
         }
 
         .modal.active {
             display: flex;
+            animation: fadeIn 0.2s ease;
         }
 
         .modal-box {
-            background: #fff;
-            border-radius: 20px;
-            padding: 24px;
+            background: var(--surface-card);
+            color: var(--text-high);
+            border-radius: 24px;
+            padding: 18px;
             width: 100%;
+            max-height: 94%;
+            overflow-y: auto;
             text-align: center;
+            box-shadow: 0 18px 44px rgba(0,0,0,0.4);
+            border: 2px solid rgba(186, 26, 26, 0.25);
+        }
+
+        /* PROTECTED EMERGENCY SOS MODAL */
+        .sos-top-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .sos-live-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-med);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sos-live-label.active {
+            color: var(--sos-red);
+        }
+
+        .sos-switch {
+            position: relative;
+            width: 42px;
+            height: 24px;
+            background: #CFC8C2;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            padding: 2px;
+            transition: background 0.2s ease;
+        }
+
+        .sos-switch.active {
+            background: var(--sos-red);
+        }
+
+        .sos-switch-knob {
+            width: 20px;
+            height: 20px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+        }
+
+        .sos-switch.active .sos-switch-knob {
+            transform: translateX(18px);
+        }
+
+        .sos-countdown-bar-wrap {
+            background: #F7EFEA;
+            border-radius: 12px;
+            padding: 9px 12px;
+            margin: 8px 0 12px 0;
+            border: 1.5px solid rgba(186, 26, 26, 0.28);
+        }
+
+        .sos-progress-track {
+            width: 100%;
+            height: 8px;
+            background: #E2D6CE;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .sos-progress-fill {
+            height: 100%;
+            background: var(--sos-red);
+            width: 100%;
+            transition: width 0.95s linear;
+        }
+
+        .sos-type-chips {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .sos-type-chip {
+            border: 1.5px solid #C8C2BC;
+            background: var(--surface-card);
+            color: var(--text-high);
+            border-radius: 16px;
+            padding: 5px 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .sos-type-chip.selected {
+            border-color: var(--sos-red);
+            background: var(--sos-bg);
+            color: #8C0009;
+        }
+
+        .sos-action-card {
+            width: 100%;
+            min-height: 60px;
+            border-radius: 14px;
+            border: none;
+            padding: 11px 14px;
+            margin-bottom: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform 0.12s ease, box-shadow 0.15s ease;
+        }
+
+        .sos-action-card:active {
+            transform: scale(0.98);
+        }
+
+        .sos-action-112 {
+            background: var(--sos-red);
+            color: #FFFFFF;
+            box-shadow: 0 4px 14px rgba(186, 26, 26, 0.35);
+        }
+
+        .sos-action-caregiver {
+            background: var(--terracotta);
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(216, 67, 21, 0.3);
+        }
+
+        .sos-action-demo {
+            background: #FFF8E1;
+            color: #1C1B1F;
+            border: 2px solid #FEB732;
+        }
+
+        .sos-cancel-btn {
+            width: 100%;
+            min-height: 56px;
+            border-radius: 14px;
+            background: var(--green);
+            color: #FFFFFF;
+            border: none;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 4px;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.28);
+        }
+
+        .sos-receipt-box {
+            text-align: left;
+            background: var(--bg-warm);
+            border-radius: 14px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 13.5px;
+            border-left: 5px solid var(--green);
+            line-height: 1.45;
+        }
+
+        .sos-receipt-box.live {
+            border-left-color: var(--sos-red);
+        }
+
+        .sos-receipt-box.error {
+            border-left-color: #E65100;
+            background: #FFF3E0;
+            color: #1C1B1F;
+        }
+
+        .sos-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+
+        .sos-badge.test {
+            background: #E8F5E9;
+            color: #1B5E20;
+            border: 1px solid #2E7D32;
+        }
+
+        .sos-badge.live {
+            background: #FFDAD6;
+            color: #93000A;
+            border: 1px solid #BA1A1A;
+        }
+
+        .sos-badge.error {
+            background: #FFE0B2;
+            color: #E65100;
+            border: 1px solid #E65100;
         }
     </style>
 </head>
@@ -328,14 +577,22 @@
 
             <!-- 1. HOME VIEW (Reference Mockup) -->
             <div id="view-home" class="subview active">
-                <div>
-                    <h1 class="brand-title">Vyavahaar</h1>
-                    <p class="greeting" id="user-greeting">Namaste,<br>(Sharma Ji)</p>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <h1 class="brand-title">Vyavahaar</h1>
+                        <p class="greeting" id="user-greeting">Namaste,<br>(Sharma Ji)</p>
+                    </div>
+                    <button class="chip" style="font-size:12px; padding:4px 10px;" onclick="switchTab('home')" title="Home">🏠 Home</button>
                 </div>
 
                 <div class="sos-wrapper">
-                    <button class="btn-sos" onclick="triggerSos()">SOS</button>
-                    <div class="sos-status-pill">112 Direct</div>
+                    <button class="btn-sos" id="home-sos-btn" onclick="triggerSos()" aria-label="SOS Emergency Help Button">
+                        <span>🚨</span>
+                        <span>SOS</span>
+                    </button>
+                    <button class="btn-add-parivaar" id="home-parivaar-btn" onclick="openParivaarModal()">
+                        + Parivaar
+                    </button>
                 </div>
 
                 <div class="mic-section">
@@ -350,6 +607,7 @@
                         <span class="chip" onclick="simulateVoice('Mujhe aaj ke satsang dikhao')">🕉️ Satsang</span>
                         <span class="chip" onclick="simulateVoice('Mere liye cab book karo')">🚖 Cab</span>
                         <span class="chip" onclick="simulateVoice('Ambulance chahiye')">🚑 Ambulance</span>
+                        <span class="chip" style="border-color: var(--sos-red); color: var(--sos-red);" onclick="simulateVoice('Bachao mujhe chakkar aa raha hai SOS')">🚨 SOS Voice</span>
                         <span class="chip" onclick="simulateVoice('Text size bada kar do')">🔍 Bada Text</span>
                     </div>
 
@@ -364,6 +622,7 @@
             <div id="view-care" class="subview">
                 <div class="view-title">
                     <span>Gaadi v Aapatkaal</span>
+                    <button class="chip" onclick="switchTab('home')">← Wapas</button>
                 </div>
                 <div class="card" style="border-left: 6px solid var(--sos-red);">
                     <h3>🚑 Aapatkaleen Ambulance (112)</h3>
@@ -387,7 +646,8 @@
             <!-- 3. EVENTS VIEW -->
             <div id="view-events" class="subview">
                 <div class="view-title">
-                    <span>Karyakram & Milan</span>
+                    <span>Karyakram &amp; Milan</span>
+                    <button class="chip" onclick="switchTab('home')">← Wapas</button>
                 </div>
                 <div id="events-list-container" style="display: flex; flex-direction: column; gap: 12px;">
                     <p>Events load ho rahe hain...</p>
@@ -397,7 +657,8 @@
             <!-- 4. SETTINGS VIEW -->
             <div id="view-settings" class="subview">
                 <div class="view-title">
-                    <span>Settings & Sugamta</span>
+                    <span>Settings &amp; Sugamta</span>
+                    <button class="chip" onclick="switchTab('home')">← Wapas</button>
                 </div>
                 <div class="card">
                     <h4>Bhasha Chuniye (Language)</h4>
@@ -448,14 +709,75 @@
             </button>
         </div>
 
-        <!-- EMERGENCY SOS MODAL -->
-        <div class="modal" id="sos-modal">
+        <!-- PROTECTED EMERGENCY SOS MODAL -->
+        <div class="modal" id="sos-modal" role="dialog" aria-modal="true" aria-labelledby="sos-modal-title">
             <div class="modal-box">
-                <div style="font-size: 48px;">🚨</div>
-                <h2 style="color: var(--sos-red); margin-top: 8px;">112 Aapatkaal Calling</h2>
-                <p style="margin: 12px 0; font-size: 17px; font-weight: 600;">Direct Emergency Number 112 ko call lagaya ja raha hai aur parivar ko location bheji ja rahi hai.</p>
-                <button class="btn-sos" style="width: 100%;" onclick="closeModal()">112 Call Karein</button>
-                <button style="margin-top: 10px; background: none; border: none; color: #666; font-size: 16px; cursor: pointer;" onclick="closeModal()">Wapas jayein</button>
+                <!-- Small Live Toggle on Top -->
+                <div class="sos-top-row">
+                    <span class="sos-live-label" id="sos-live-label">Live</span>
+                    <button class="sos-switch" id="sos-live-switch" onclick="toggleSosDemoMode()" role="switch" aria-checked="false" aria-label="Toggle Live SOS Mode">
+                        <div class="sos-switch-knob"></div>
+                    </button>
+                </div>
+
+                <!-- STEP 1: Heading + Cancel Timer Just Below It -->
+                <div id="sos-step-confirm">
+                    <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom: 14px;">
+                        <span style="font-size: 28px;">🚨</span>
+                        <h2 id="sos-modal-title" style="color: var(--sos-red); font-size: 22px; font-weight: 800;">Aapatkaal SOS Suraksha</h2>
+                    </div>
+
+                    <!-- Cancel Timer Just Below Heading -->
+                    <div class="sos-countdown-bar-wrap" id="sos-countdown-box">
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size: 15px; font-weight: 800; margin-bottom: 8px;">
+                            <span id="sos-countdown-label">⏳ Cancel Timer: <strong>5s</strong></span>
+                            <button onclick="cancelSos('user_cancelled')" style="background:var(--sos-red); color:#fff; border:none; border-radius:10px; padding:6px 16px; font-size:14px; font-weight:800; cursor:pointer;">✕ Cancel</button>
+                        </div>
+                        <div class="sos-progress-track">
+                            <div class="sos-progress-fill" id="sos-progress-fill" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Simple Dispatched Result -->
+                <div id="sos-step-result" style="display: none;">
+                    <h3 id="sos-result-title" style="font-size: 21px; font-weight: 800; color: var(--sos-red); margin-bottom: 10px;">
+                        🚨 Emergency Called
+                    </h3>
+
+                    <div class="sos-receipt-box" id="sos-receipt-box" style="font-size: 16px; font-weight: 700; display: flex; flex-direction: column; gap: 8px; padding: 14px;">
+                        <div id="sos-res-112" style="color: var(--sos-red); font-weight: 800;">📞 Emergency (112) Called</div>
+                        <div id="sos-res-contacts" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                    </div>
+
+                    <button class="sos-cancel-btn" style="margin-top: 10px; min-height: 46px; font-size: 15px;" onclick="closeModal()">✓ Done</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- + PARIVAAR (GUARDIAN LIST & ADD) MODAL -->
+        <div class="modal" id="parivaar-modal" role="dialog" aria-modal="true" aria-labelledby="parivaar-modal-title">
+            <div class="modal-box">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+                    <h2 id="parivaar-modal-title" style="font-size: 20px; font-weight: 800; color: var(--text-high);">👨‍👩‍👧 Mera Parivaar (Guardians)</h2>
+                    <button onclick="closeParivaarModal()" style="background:none; border:none; font-size:20px; font-weight:800; cursor:pointer; color:var(--text-med);">✕</button>
+                </div>
+
+                <!-- Current Parivaar Members List -->
+                <div id="parivaar-list-container" style="margin-bottom: 14px; max-height: 180px; overflow-y: auto;">
+                    <p style="font-size: 14px; color: var(--text-med);">Loading Parivaar list...</p>
+                </div>
+
+                <!-- Add New Guardian Form -->
+                <div style="background: var(--bg-warm); padding: 12px; border-radius: 14px; text-align: left;">
+                    <div style="font-size: 14px; font-weight: 800; margin-bottom: 8px; color: var(--terracotta);">+ Add Guardian to Parivaar</div>
+                    <input type="text" id="parivaar-name" class="parivaar-input" placeholder="Guardian Name (e.g. Rahul Sharma)">
+                    <input type="tel" id="parivaar-phone" class="parivaar-input" placeholder="Phone Number (e.g. +919876543211)">
+                    <input type="text" id="parivaar-relation" class="parivaar-input" placeholder="Relation (e.g. Son / Daughter / Doctor)">
+                    <button class="btn-action" style="margin-top: 4px; height: 44px; background: var(--sos-red);" onclick="addParivaarMember()">
+                        + Add to Parivaar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -465,7 +787,16 @@
         let token = null;
         let activeRecognition = null;
 
-        // Auto-authenticate with dev credentials on page load
+        // SOS State Machine Variables
+        // States: IDLE | CONFIRMING | DISPATCHING | DISPATCHED_TEST | DISPATCHED_LIVE | DIALING_112 | ERROR_OFFLINE_FALLBACK
+        let sosState = 'IDLE';
+        let sosDemoMode = true; // Safe Demo Mode ON by default for judge/prototype safety
+        let selectedEmergencyType = 'GENERAL_SOS';
+        let sosCountdownTimer = null;
+        let sosSecondsRemaining = 5;
+        let sosCountdownPaused = false;
+
+        // Auto-authenticate with dev credentials on page load & ensure demo emergency contact exists
         async function initAuth() {
             try {
                 await fetch('/api/v1/auth/request-otp', {
@@ -482,6 +813,7 @@
                     const data = await resp.json();
                     token = data.access_token;
                     console.log('[Auth] Demo token obtained successfully.');
+                    await ensureDemoCaregiverContact();
                 } else {
                     console.error('[Auth] OTP verify failed:', resp.status);
                 }
@@ -489,6 +821,161 @@
                 console.error('[Auth] initAuth error:', e);
             }
         }
+
+        async function ensureDemoCaregiverContact() {
+            if (!token) return;
+            try {
+                const profResp = await fetch('/api/v1/profile/', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!profResp.ok) return;
+                const prof = await profResp.json();
+                if (!prof.emergency_contacts || prof.emergency_contacts.length === 0) {
+                    await fetch('/api/v1/profile/emergency-contacts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({
+                            name: 'Priya Sharma',
+                            phone_number: '+919876500001',
+                            relationship_type: 'Daughter (Primary Caregiver)',
+                            is_primary: true,
+                            can_view_location: true
+                        })
+                    });
+                }
+                await refreshParivaarButtonCount();
+            } catch (e) {
+                console.warn('[SOS] Could not seed default caregiver contact:', e);
+            }
+        }
+
+        let cachedParivaarContacts = [];
+
+        async function refreshParivaarButtonCount() {
+            if (!token) return;
+            try {
+                const profResp = await fetch('/api/v1/profile/', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!profResp.ok) return;
+                const prof = await profResp.json();
+                cachedParivaarContacts = prof.emergency_contacts || [];
+                const count = cachedParivaarContacts.length;
+                const btn = document.getElementById('home-parivaar-btn');
+                if (btn) {
+                    btn.innerText = count > 0 ? `+ Parivaar (${count})` : '+ Parivaar';
+                }
+            } catch (e) {
+                console.warn('[Parivaar] Count refresh failed:', e);
+            }
+        }
+
+        async function openParivaarModal() {
+            document.getElementById('parivaar-modal').classList.add('active');
+            await loadParivaarList();
+        }
+
+        function closeParivaarModal() {
+            document.getElementById('parivaar-modal').classList.remove('active');
+        }
+
+        async function loadParivaarList() {
+            const container = document.getElementById('parivaar-list-container');
+            if (!token) await initAuth();
+            try {
+                const res = await fetch('/api/v1/profile/', {
+                    headers: { 'Authorization': 'Bearer ' + (token || '') }
+                });
+                const prof = await res.json();
+                const contacts = prof.emergency_contacts || [];
+                await refreshParivaarButtonCount();
+
+                if (contacts.length === 0) {
+                    container.innerHTML = '<p style="font-size:13.5px; color:var(--text-med); padding:8px;">Abhi koi guardian nahi juda hai. Neeche form se jodein.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                contacts.forEach(c => {
+                    const row = document.createElement('div');
+                    row.className = 'parivaar-item';
+                    row.innerHTML = `
+                        <div>
+                            <div style="font-size:15px; font-weight:800; color:var(--text-high);">${c.name} <span style="font-size:12px; color:var(--terracotta);">(${c.relationship_type})</span></div>
+                            <div style="font-size:13px; color:var(--text-med);">📞 ${c.phone_number}</div>
+                        </div>
+                        <button onclick="removeParivaarMember(${c.id})" style="background:#FFDAD6; color:var(--sos-red); border:none; border-radius:8px; padding:4px 10px; font-size:12px; font-weight:800; cursor:pointer;" title="Remove">✕</button>
+                    `;
+                    container.appendChild(row);
+                });
+            } catch (e) {
+                container.innerHTML = '<p style="color:var(--sos-red); font-size:13px;">Parivaar list load nahi ho saki.</p>';
+            }
+        }
+
+        async function addParivaarMember() {
+            const nameEl = document.getElementById('parivaar-name');
+            const phoneEl = document.getElementById('parivaar-phone');
+            const relEl = document.getElementById('parivaar-relation');
+
+            const name = nameEl.value.trim();
+            const phone = phoneEl.value.trim();
+            const relation = relEl.value.trim() || 'Guardian';
+
+            if (name.length < 2 || phone.length < 8) {
+                alert('Kripya sahi naam aur phone number darj karein.');
+                return;
+            }
+
+            if (!token) await initAuth();
+
+            try {
+                const res = await fetch('/api/v1/profile/emergency-contacts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (token || '')
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        phone_number: phone,
+                        relationship_type: relation,
+                        is_primary: false,
+                        can_view_location: true
+                    })
+                });
+                if (res.ok) {
+                    nameEl.value = '';
+                    phoneEl.value = '';
+                    relEl.value = '';
+                    speak(name + ' ko Parivaar mein jod diya gaya hai.');
+                    await loadParivaarList();
+                } else {
+                    alert('Guardian add karne mein samasya aayi.');
+                }
+            } catch (e) {
+                alert('Network error: Guardian add nahi ho saka.');
+            }
+        }
+
+        async function removeParivaarMember(contactId) {
+            if (!token) return;
+            try {
+                const res = await fetch(`/api/v1/profile/emergency-contacts/${contactId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    await loadParivaarList();
+                }
+            } catch (e) {
+                console.error('[Parivaar] Delete error:', e);
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', initAuth);
 
         function speak(text) {
@@ -514,7 +1001,6 @@
 
             if (!token) {
                 document.getElementById('assistant-response-text').innerText = '⚠️ Session suru ho raha hai, thodi der mein dobara koshish karein.';
-                // Retry auth once
                 await initAuth();
                 if (!token) return;
             }
@@ -569,7 +1055,6 @@
             const btn = document.getElementById('main-mic-btn');
             const prompt = document.getElementById('mic-text');
 
-            // Stop any active recognition session first
             if (isListening && activeRecognition) {
                 activeRecognition.stop();
                 activeRecognition = null;
@@ -632,13 +1117,222 @@
             recognition.start();
         }
 
+        // =====================================================================
+        // 3. EMERGENCY ASSISTANCE & SOS WORKFLOW
+        // =====================================================================
+
+        function updateSosBannerUi() {
+            const liveSwitch = document.getElementById('sos-live-switch');
+            const liveLabel = document.getElementById('sos-live-label');
+            const isLive = !sosDemoMode;
+
+            if (liveSwitch) {
+                liveSwitch.classList.toggle('active', isLive);
+                liveSwitch.setAttribute('aria-checked', String(isLive));
+            }
+            if (liveLabel) {
+                liveLabel.classList.toggle('active', isLive);
+            }
+        }
+
+        function toggleSosDemoMode() {
+            sosDemoMode = !sosDemoMode;
+            updateSosBannerUi();
+        }
+
+        function clearSosCountdown() {
+            if (sosCountdownTimer) {
+                clearInterval(sosCountdownTimer);
+                sosCountdownTimer = null;
+            }
+        }
+
+        function startSosCountdown() {
+            clearSosCountdown();
+            sosSecondsRemaining = 5;
+            sosCountdownPaused = false;
+            const label = document.getElementById('sos-countdown-label');
+            const fill = document.getElementById('sos-progress-fill');
+
+            if (label) label.innerHTML = `⏳ Cancel Timer: <strong>${sosSecondsRemaining}s</strong>`;
+            if (fill) fill.style.width = '100%';
+
+            sosCountdownTimer = setInterval(() => {
+                if (sosCountdownPaused) return;
+                sosSecondsRemaining -= 1;
+                const pct = Math.max(0, (sosSecondsRemaining / 5) * 100);
+                if (fill) fill.style.width = pct + '%';
+
+                if (sosSecondsRemaining <= 0) {
+                    clearSosCountdown();
+                    // Timer completed without cancel -> notify everyone in Parivaar list & trigger 112
+                    dispatchSosBackend(sosDemoMode);
+                } else {
+                    if (label) label.innerHTML = `⏳ Cancel Timer: <strong>${sosSecondsRemaining}s</strong>`;
+                }
+            }, 1000);
+        }
+
+        function openSosConfirmView() {
+            sosState = 'CONFIRMING';
+            const stepConfirm = document.getElementById('sos-step-confirm');
+            const stepResult = document.getElementById('sos-step-result');
+            if (stepConfirm) stepConfirm.style.display = 'block';
+            if (stepResult) stepResult.style.display = 'none';
+            updateSosBannerUi();
+            startSosCountdown();
+        }
+
         function triggerSos() {
             document.getElementById('sos-modal').classList.add('active');
-            speak("112 emergency dialing shuru kar rahe hain.");
+            openSosConfirmView();
+            speak('Aapatkaal SOS shuru. Radd karne ke liye 5 second mein Cancel dabayein.');
+        }
+
+        function cancelSos(reason) {
+            clearSosCountdown();
+            sosState = 'IDLE';
+            document.getElementById('sos-modal').classList.remove('active');
+            speak('Theek hai, aapatkaal alert radd kar diya gaya hai.');
         }
 
         function closeModal() {
+            clearSosCountdown();
+            sosState = 'IDLE';
             document.getElementById('sos-modal').classList.remove('active');
+        }
+
+        let userLat = 12.9716;
+        let userLon = 77.5946;
+
+        // Request live GPS coordinates from browser if available
+        if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    userLat = Number(pos.coords.latitude.toFixed(5));
+                    userLon = Number(pos.coords.longitude.toFixed(5));
+                },
+                () => { /* fallback to default Bengaluru coordinates */ },
+                { timeout: 4000 }
+            );
+        }
+
+        async function dispatchSosBackend(isTestMode) {
+            clearSosCountdown();
+            sosState = 'DISPATCHING';
+
+            if (!token) {
+                await initAuth();
+            }
+
+            try {
+                await refreshParivaarButtonCount();
+                const res = await fetch('/api/v1/profile/sos-alert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (token || '')
+                    },
+                    body: JSON.stringify({
+                        is_test_mode: Boolean(isTestMode),
+                        emergency_type: selectedEmergencyType,
+                        location_latitude: userLat,
+                        location_longitude: userLon,
+                        location_name: 'Indiranagar, Bengaluru'
+                    })
+                });
+
+                if (!res.ok) {
+                    throw new Error('Backend returned HTTP ' + res.status);
+                }
+
+                const data = await res.json();
+                renderSosDispatchResult(data);
+            } catch (err) {
+                console.error('[SOS] Dispatch error:', err);
+                renderSosOfflineFallback(err.message || 'Network unreachable');
+            }
+        }
+
+        function renderSosDispatchResult(data) {
+            sosState = data.is_test_mode ? 'DISPATCHED_TEST' : 'DISPATCHED_LIVE';
+            document.getElementById('sos-step-confirm').style.display = 'none';
+            document.getElementById('sos-step-result').style.display = 'block';
+
+            const receipt = document.getElementById('sos-receipt-box');
+            const titleEl = document.getElementById('sos-result-title');
+            const dialerSpan = document.getElementById('sos-res-112');
+            const contactsContainer = document.getElementById('sos-res-contacts');
+
+            if (titleEl) titleEl.innerText = '🚨 Emergency Called';
+            if (receipt) receipt.className = data.is_test_mode ? 'sos-receipt-box' : 'sos-receipt-box live';
+            if (dialerSpan) dialerSpan.innerText = '📞 Emergency (112) Called';
+
+            // Use actual + Parivaar list so adding/removing guardians is always reflected accurately
+            let names = [];
+            if (Array.isArray(cachedParivaarContacts)) {
+                names = cachedParivaarContacts.map(c => c.name);
+            } else if (Array.isArray(data.guardian_dispatches) && data.guardian_dispatches.length > 0) {
+                names = data.guardian_dispatches.map(g => g.name);
+            }
+
+            if (contactsContainer) {
+                contactsContainer.innerHTML = '';
+                if (names.length > 0) {
+                    names.forEach(personName => {
+                        const row = document.createElement('div');
+                        row.style.cssText = 'color: var(--green); font-weight: 800; font-size: 16px;';
+                        row.innerText = `✅ ${personName} Notified`;
+                        contactsContainer.appendChild(row);
+                    });
+                } else {
+                    const emptyRow = document.createElement('div');
+                    emptyRow.style.cssText = 'color: #E65100; font-weight: 700; font-size: 14.5px;';
+                    emptyRow.innerText = '⚠️ No one notified — No guardians added in + Parivaar.';
+                    contactsContainer.appendChild(emptyRow);
+                }
+            }
+
+            if (!data.is_test_mode) {
+                // Live mode background dispatch
+                const mapUrl = data.google_maps_url || `https://maps.google.com/?q=${userLat},${userLon}`;
+                const alertText = (data.alert_message_payload || 'Emergency SOS Alert') + ` | Map: ${mapUrl}`;
+                const encodedMsg = encodeURIComponent(alertText);
+                if (Array.isArray(data.guardian_dispatches) && data.guardian_dispatches.length > 0) {
+                    window.open(data.guardian_dispatches[0].whatsapp_url, '_blank');
+                } else if (cachedParivaarContacts.length > 0) {
+                    const digits = (cachedParivaarContacts[0].phone_number || '').replace(/[^0-9]/g, '');
+                    window.open(`https://wa.me/${digits}?text=${encodedMsg}`, '_blank');
+                }
+                setTimeout(() => { window.location.href = 'tel:112'; }, 400);
+            }
+
+            if (names.length > 0) {
+                speak(`Emergency 112 par call lagaya gaya aur ${names.join(', ')} ko soochit kiya gaya.`);
+            } else {
+                speak('Emergency 112 par call lagaya gaya. Parivaar mein koi guardian nahi juda hai.');
+            }
+        }
+
+        function renderSosOfflineFallback() {
+            sosState = 'ERROR_OFFLINE_FALLBACK';
+            document.getElementById('sos-step-confirm').style.display = 'none';
+            document.getElementById('sos-step-result').style.display = 'block';
+
+            const receipt = document.getElementById('sos-receipt-box');
+            const titleEl = document.getElementById('sos-result-title');
+            const dialerSpan = document.getElementById('sos-res-112');
+            const contactsContainer = document.getElementById('sos-res-contacts');
+
+            if (titleEl) titleEl.innerText = '🚨 Emergency Called';
+            if (receipt) receipt.className = 'sos-receipt-box error';
+            if (dialerSpan) dialerSpan.innerText = '📞 Emergency (112) Called';
+            if (contactsContainer) {
+                contactsContainer.innerHTML =
+                    '<div style="color: #E65100; font-weight: 700; font-size: 14.5px;">⚠️ No one notified — No internet connection.</div>';
+            }
+
+            speak('Emergency 112 par call lagaya ja raha hai. Internet na hone ke kaaran Parivaar ko sandesh nahi bheja ja saka.');
         }
 
         function switchTab(tab) {
@@ -655,7 +1349,9 @@
             const container = document.getElementById('events-list-container');
             container.innerHTML = "Events load ho rahe hain...";
             try {
-                const res = await fetch('/api/v1/events/');
+                const res = await fetch('/api/v1/events/', {
+                    headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+                });
                 const events = await res.json();
                 container.innerHTML = "";
                 events.forEach(ev => {
@@ -680,7 +1376,10 @@
 
         async function registerEvent(id, btn) {
             try {
-                const res = await fetch(`/api/v1/events/${id}/register`, { method: 'POST' });
+                const res = await fetch(`/api/v1/events/${id}/register`, {
+                    method: 'POST',
+                    headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+                });
                 const data = await res.json();
                 btn.style.background = "var(--green)";
                 btn.innerText = "✓ Registered";
@@ -694,7 +1393,10 @@
             const dest = document.getElementById('cab-dest').value;
             const res = await fetch('/api/v1/transport/request', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+                },
                 body: JSON.stringify({ request_type: 'CAB', pickup_address: 'Home', destination_address: dest })
             });
             const data = await res.json();
@@ -708,7 +1410,10 @@
         async function requestAmbulance() {
             const res = await fetch('/api/v1/transport/request', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+                },
                 body: JSON.stringify({ request_type: 'AMBULANCE', pickup_address: 'Home', destination_address: 'Nearest Hospital' })
             });
             const data = await res.json();
@@ -724,7 +1429,9 @@
             const resContainer = document.getElementById('med-search-res');
             resContainer.innerHTML = "Khoj rahe hain...";
             try {
-                const res = await fetch(`/api/v1/prescriptions/medicines/search?q=${encodeURIComponent(q)}`);
+                const res = await fetch(`/api/v1/prescriptions/medicines/search?q=${encodeURIComponent(q)}`, {
+                    headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+                });
                 const data = await res.json();
                 let html = `<p><strong>Salt:</strong> ${data.matched_salt}</p><ul style="margin: 6px 0 0 16px;">`;
                 data.verified_equivalents.forEach(eq => {
